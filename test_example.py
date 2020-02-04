@@ -3,6 +3,7 @@ An example python file to show docstrings and minimal type hints.
 
 The maximum line length used in this project is 120 characters.
 Docstrings are in the google style.
+Type hints are encouraged but not required.
 """
 
 
@@ -73,5 +74,4 @@ def test_fib_general():
 
     As long as they are, all further values must also be correct due to Python's arbitrary-precision int arithmetic.
     """
-    assert [fib(x) for x in range(2, 15)] == [
-        1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377]
+    assert [fib(x) for x in range(2, 15)] == [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377]
