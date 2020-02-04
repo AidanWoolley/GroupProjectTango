@@ -14,7 +14,7 @@ def fib(n: int) -> int:
   return f0
   
   
-  def fib_test_not_int():
+  def test_fib_not_int():
     try:
       fib(0.45)
     except TypeError as e:
@@ -22,7 +22,7 @@ def fib(n: int) -> int:
       return
     assert False
   
-  def fib_test_negative():
+  def test_fib_negative():
     try:
       fib(-1)
     except ValueError as e:
@@ -30,11 +30,11 @@ def fib(n: int) -> int:
       return
     assert False
   
-  def fib_test_0():
+  def test_fib_0():
     assert fib(0) == 0
   
-  def fib_test_1():
+  def test_fib_1():
     assert fib(1) == 1
   
-  def fib_test_general():
+  def test_fib_general():
     assert [fib(x) for x in range(2, 15)] == [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377]
