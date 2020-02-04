@@ -17,7 +17,7 @@ def fib(n: int) -> int:
   def fib_test_not_int():
     try:
       fib(0.45)
-    catch TypeError as e:
+    except TypeError as e:
       assert True
       return
     assert False
@@ -25,7 +25,7 @@ def fib(n: int) -> int:
   def fib_test_negative():
     try:
       fib(-1)
-    catch ValueError as e:
+    except ValueError as e:
       assert True
       return
     assert False
