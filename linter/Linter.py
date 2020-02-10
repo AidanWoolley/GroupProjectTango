@@ -13,7 +13,7 @@ class Linter:
     @staticmethod
     def _score_formula(errors):
         """
-        Given a list of errors, returns score displayed to the user being in range [0,1]
+        Given a list of errors, returns score displayed to the user being in range [0,1].
 
         Currently the default scoring formula of reducing 0.05 per error.
         Args:
@@ -27,6 +27,7 @@ class Linter:
     @staticmethod
     def _invoke_rscript(filename):
         """
+
         Invokes the R script for the given file.
         Args:
             filename:
