@@ -1,19 +1,19 @@
+"""
+    The class to perform static analysis of R code.
+"""
 import os
 import subprocess
 import json
 from pathlib import Path
 __author__ = 'Kacper Walentynowicz'
+
+
 class Linter:
-    '''
-    The class to perform static analysis of R code.
-    '''
     _LINTER_OUTPUT = '__linter_output__.txt'
-    def __init__(self):
-        pass
 
     @staticmethod
     def _score_formula(errors):
-        '''
+        """
         Given a list of errors, returns score displayed to the user being in range [0,1]
         Currently the default scoring formula of reducing 0.05 per error.
         Args:
@@ -21,19 +21,21 @@ class Linter:
 
         Returns:
             Float: score of user's code
-        '''
+        """
+
         return max(0, 1.0 - len(errors) * 0.05)
 
     @staticmethod
     def _invoke_rscript(filename):
-        '''
+        """
         Invokes the R script for the given file.
         Args:
             filename:
 
         Returns:
-            None:
-        '''
+            None
+        """
+
         my_file = Path(filename)
         if not my_file.is_file():
             raise FileNotFoundError
@@ -43,7 +45,7 @@ class Linter:
 
     @staticmethod
     def _linter_output_line_to_error_dictionary(line):
-        '''
+        """
         Name self-explanatory, so I will describe the algorithm used for parsing.
         The format of the line:
         FILEPATH:LINE_NUMBER:COLUMN_NUMBER:TYPE:MESSAGE
@@ -60,14 +62,15 @@ class Linter:
         FILEPATH (possibly we need to join a few strings to obtain FILEPATH)
         MESSAGE is a concatenation of strings after the one responsible for TYPE.
 
-        To check sanity of the algorithm, a flag is used to verify that there is exactly one place where TYPE could match.
+        To check sanity of the algorithm, flag is used to verify that there is exactly one place where TYPE could match.
         Violation of this raises RuntimeError.
         Args:
             line (str): meaningful line of _LINTER_OUTPUT used
 
         Returns:
             dictionary: error in format suitable for EDUKATE platform
-        '''
+        """
+
         dict = {"file_path": "path to file", "line_number": 0, "type": "type of error", "info": "error message"}
         data = line.split(':')
         data = [x.strip() for x in data]
@@ -105,12 +108,14 @@ class Linter:
 
     @staticmethod
     def _errors_list_from_linter_output():
-        '''
+        """
         Parses file _LINTER_OUTPUT and returns a list of errors.
         Uses the fact that each error is displayed in exactly three lines.
-        Returns:
 
-        '''
+        Returns:
+            list of errors in format suitable for EDUKATE platform
+        """
+
         errors = []
         with open(Linter._LINTER_OUTPUT) as linted_file:
             content = linted_file.readlines()
@@ -123,22 +128,23 @@ class Linter:
 
     @staticmethod
     def _clear_linter_output():
-        '''
+        """
         Clearing after the script.
         Returns:
             None
-        '''
+        """
+
         os.remove(Linter._LINTER_OUTPUT)
 
     @staticmethod
     def _parse_linter_output(keep_output):
-        '''
-
+        """
         Args:
             keep_output (bool): whether to keep the lint in plaintext (_LINTER_OUTPUT)
         Returns:
             JSON object: a JSON describing errors in format suitable for EDUKATE platform
-        '''
+        """
+
         out = {"runners": [
             {"errors": [],"score": 1,"runner_key": "Hadley Wickham's R Style Guide"}
         ]}
@@ -154,7 +160,7 @@ class Linter:
 
     @staticmethod
     def lint(filename, keep_output = False):
-        '''
+        """
         Uses a separate R script to make use of 'lintr' library from that language.
         Invokes that script to produce temporary _LINTER_OUTPUT,
         parses that output to produce comments in the right format,
@@ -165,7 +171,8 @@ class Linter:
 
         Returns:
             JSON object: a JSON describing errors in format suitable for EDUKATE platform
-        '''
+        """
+
         Linter._invoke_rscript(filename)
         return Linter._parse_linter_output(keep_output)
 
