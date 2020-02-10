@@ -27,8 +27,8 @@ class Linter:
     @staticmethod
     def _invoke_rscript(filename):
         """
-
         Invokes the R script for the given file.
+
         Args:
             filename:
 
