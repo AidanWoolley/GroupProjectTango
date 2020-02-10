@@ -12,9 +12,9 @@ class Linter:
 
     @staticmethod
     def _score_formula(errors):
-
         """
         Given a list of errors, returns score displayed to the user being in range [0,1]
+
         Currently the default scoring formula of reducing 0.05 per error.
         Args:
             errors: list of errors returned by the linter
@@ -26,7 +26,6 @@ class Linter:
 
     @staticmethod
     def _invoke_rscript(filename):
-
         """
         Invokes the R script for the given file.
         Args:
@@ -44,9 +43,9 @@ class Linter:
 
     @staticmethod
     def _linter_output_line_to_error_dictionary(line):
-
         """
         Name self-explanatory, so I will describe the algorithm used for parsing.
+
         The format of the line:
         FILEPATH:LINE_NUMBER:COLUMN_NUMBER:TYPE:MESSAGE
         like this one:
@@ -107,9 +106,9 @@ class Linter:
 
     @staticmethod
     def _errors_list_from_linter_output():
-
         """
         Parses file _LINTER_OUTPUT and returns a list of errors.
+
         Uses the fact that each error is displayed in exactly three lines.
 
         Returns:
@@ -126,9 +125,9 @@ class Linter:
 
     @staticmethod
     def _clear_linter_output():
-
         """
         Clearing after the script.
+
         Returns:
             None
         """
@@ -136,8 +135,9 @@ class Linter:
 
     @staticmethod
     def _parse_linter_output(keep_output):
-
         """
+        Parses the linter output to a JSON format.
+
         Args:
             keep_output (bool): whether to keep the lint in plaintext (_LINTER_OUTPUT)
         Returns:
@@ -158,9 +158,9 @@ class Linter:
 
     @staticmethod
     def lint(filename, keep_output=False):
-
         """
-        Uses a separate R script to make use of 'lintr' library from that language.
+        Uses a separate R script to make use of 'lintr' library from that language and perform static code analysis.
+
         Invokes that script to produce temporary _LINTER_OUTPUT,
         parses that output to produce comments in the right format,
         and cleans _LINTER_OUTPUT if desired.
