@@ -133,6 +133,7 @@ class Linter:
             None
         """
         os.remove(Linter._LINTER_OUTPUT)
+        return None
 
     @staticmethod
     def _parse_linter_output(keep_output):
