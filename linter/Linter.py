@@ -43,6 +43,31 @@ class Linter:
 
     @staticmethod
     def _linter_output_line_to_error_dictionary(line):
+        '''
+        Name self-explanatory, so I will describe the algorithm used for parsing.
+        The format of the line:
+        FILEPATH:LINE_NUMBER:COLUMN_NUMBER:TYPE:MESSAGE
+        like this one:
+        /GroupProject/intro.r:2:1: style: Use spaces to indent, not tabs.
+
+        Algorithm used for parsing:
+        First, observe that the content is displayed by colons.
+        Therefore, we start by splitting with ':', then stripping from trailing and leading spaces.
+        The problem is that both FILEPATH and MESSAGE can contain ':' characters, so instead we parse from the middle.
+
+        The algorithm searches for strings matching TYPE after split: {'error', 'warning', 'style'}.
+        Then, what follows immediately before is a COLUMN_NUMBER, before - LINE_NUMBER and even more before -
+        FILEPATH (possibly we need to join a few strings to obtain FILEPATH)
+        MESSAGE is a concatenation of strings after the one responsible for TYPE.
+
+        To check sanity of the algorithm, a flag is used to verify that there is exactly one place where TYPE could match.
+        Violation of this raises RuntimeError.
+        Args:
+            line (str): meaningful line of _LINTER_OUTPUT used
+
+        Returns:
+            dictionary: error in format suitable for EDUKATE platform
+        '''
         dict = {"file_path": "path to file", "line_number": 0, "type": "type of error", "info": "error message"}
         data = line.split(':')
         data = [x.strip() for x in data]
