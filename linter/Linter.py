@@ -1,6 +1,4 @@
-"""
-    The class to perform static analysis of R code.
-"""
+"""The class to perform static analysis of R code."""
 import os
 import subprocess
 import json
@@ -9,10 +7,12 @@ __author__ = 'Kacper Walentynowicz'
 
 
 class Linter:
+    """The class to perform static analysis of R code."""
     _LINTER_OUTPUT = '__linter_output__.txt'
 
     @staticmethod
     def _score_formula(errors):
+
         """
         Given a list of errors, returns score displayed to the user being in range [0,1]
         Currently the default scoring formula of reducing 0.05 per error.
@@ -22,11 +22,11 @@ class Linter:
         Returns:
             Float: score of user's code
         """
-
         return max(0, 1.0 - len(errors) * 0.05)
 
     @staticmethod
     def _invoke_rscript(filename):
+
         """
         Invokes the R script for the given file.
         Args:
@@ -35,7 +35,6 @@ class Linter:
         Returns:
             None
         """
-
         my_file = Path(filename)
         if not my_file.is_file():
             raise FileNotFoundError
@@ -45,6 +44,7 @@ class Linter:
 
     @staticmethod
     def _linter_output_line_to_error_dictionary(line):
+
         """
         Name self-explanatory, so I will describe the algorithm used for parsing.
         The format of the line:
@@ -70,7 +70,6 @@ class Linter:
         Returns:
             dictionary: error in format suitable for EDUKATE platform
         """
-
         dict = {"file_path": "path to file", "line_number": 0, "type": "type of error", "info": "error message"}
         data = line.split(':')
         data = [x.strip() for x in data]
@@ -108,6 +107,7 @@ class Linter:
 
     @staticmethod
     def _errors_list_from_linter_output():
+
         """
         Parses file _LINTER_OUTPUT and returns a list of errors.
         Uses the fact that each error is displayed in exactly three lines.
@@ -115,38 +115,36 @@ class Linter:
         Returns:
             list of errors in format suitable for EDUKATE platform
         """
-
         errors = []
         with open(Linter._LINTER_OUTPUT) as linted_file:
             content = linted_file.readlines()
             for line in range(len(content)):
                 if line % 3 == 0:
-                    #every error description is three lines but only the first one is interesting for us
                     errors.append(Linter._linter_output_line_to_error_dictionary(content[line]))
 
         return errors
 
     @staticmethod
     def _clear_linter_output():
+
         """
         Clearing after the script.
         Returns:
             None
         """
-
         os.remove(Linter._LINTER_OUTPUT)
 
     @staticmethod
     def _parse_linter_output(keep_output):
+
         """
         Args:
             keep_output (bool): whether to keep the lint in plaintext (_LINTER_OUTPUT)
         Returns:
             JSON object: a JSON describing errors in format suitable for EDUKATE platform
         """
-
         out = {"runners": [
-            {"errors": [],"score": 1,"runner_key": "Hadley Wickham's R Style Guide"}
+            {"errors": [], "score": 1, "runner_key": "Hadley Wickham's R Style Guide"}
         ]}
 
         errors_list = Linter._errors_list_from_linter_output()
@@ -159,7 +157,8 @@ class Linter:
         return json.dumps(out)
 
     @staticmethod
-    def lint(filename, keep_output = False):
+    def lint(filename, keep_output=False):
+
         """
         Uses a separate R script to make use of 'lintr' library from that language.
         Invokes that script to produce temporary _LINTER_OUTPUT,
@@ -172,9 +171,9 @@ class Linter:
         Returns:
             JSON object: a JSON describing errors in format suitable for EDUKATE platform
         """
-
         Linter._invoke_rscript(filename)
         return Linter._parse_linter_output(keep_output)
+
 
 print(Linter.lint(filename='linter/example_linter_input.R', keep_output=False))
 quit()
