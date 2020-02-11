@@ -52,7 +52,7 @@ class Linter:
             A list of dictionaries detailing errors in a format suitable for the EDUKATE platform
         """
         err_line_regex = (
-            rf"^(?P<path>{self.file_to_lint}):"
+            rf"^(?P<path>{re.escape(self.file_to_lint)}):"
             r"(?P<line>\d+):"
             r"(?P<col>\d+): "
             r"(?P<type>style|warning|error): "
