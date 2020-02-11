@@ -43,7 +43,8 @@ class Linter:
         command = ['Rscript', 'lint_rfile.R', file_to_lint]
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
-    def _errors_list_from_linter_output(self, linted_file, linter_output):
+    @staticmethod
+    def _errors_list_from_linter_output(linted_file, linter_output):
         """
         Parses the multiline string `linter_output` and returns a list of errors.
 
@@ -73,6 +74,7 @@ class Linter:
 
         return errors_list
 
+    @staticmethod
     def lint(file_to_lint):
         """
         Uses a separate R script to make use of 'lintr' library from that language.
