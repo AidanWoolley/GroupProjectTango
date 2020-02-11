@@ -1,21 +1,22 @@
 """The class to perform static analysis of R code."""
-import os
 import subprocess
 import json
+import re
+from os.path import abspath
 from pathlib import Path
 __author__ = 'Kacper Walentynowicz'
 
 
 class Linter:
     """The class to perform static analysis of R code."""
-    _LINTER_OUTPUT = '__linter_output__.txt'
 
     @staticmethod
-    def _score_formula(errors):
+    def _score_file_by_errors(errors):
         """
         Given a list of errors, returns score displayed to the user being in range [0,1].
 
-        Currently the default scoring formula of reducing 0.05 per error.
+        Currently the default scoring formula of deducting 0.05 per error.
+
         Args:
             errors: list of errors returned by the linter
 
@@ -25,147 +26,60 @@ class Linter:
         return max(0, 1.0 - len(errors) * 0.05)
 
     @staticmethod
-    def _invoke_rscript(filename):
+    def _invoke_lintr(file_to_lint):
         """
-        Invokes the R script for the given file.
+        Invokes the R  linter script for `self.file_to_lint`.
 
         Args:
-            filename:
-
-        Returns:
             None
-        """
-        my_file = Path(filename)
-        if not my_file.is_file():
-            raise FileNotFoundError
-        else:
-            command = './linter/lint_rfile.R ' + filename
-            subprocess.call(command, shell=True)
-
-    @staticmethod
-    def _linter_output_line_to_error_dictionary(line):
-        """
-        Name self-explanatory, so I will describe the algorithm used for parsing.
-
-        The format of the line:
-        FILEPATH:LINE_NUMBER:COLUMN_NUMBER:TYPE:MESSAGE
-        like this one:
-        /GroupProject/intro.r:2:1: style: Use spaces to indent, not tabs.
-
-        Algorithm used for parsing:
-        First, observe that the content is displayed by colons.
-        Therefore, we start by splitting with ':', then stripping from trailing and leading spaces.
-        The problem is that both FILEPATH and MESSAGE can contain ':' characters, so instead we parse from the middle.
-
-        The algorithm searches for strings matching TYPE after split: {'error', 'warning', 'style'}.
-        Then, what follows immediately before is a COLUMN_NUMBER, before - LINE_NUMBER and even more before -
-        FILEPATH (possibly we need to join a few strings to obtain FILEPATH)
-        MESSAGE is a concatenation of strings after the one responsible for TYPE.
-
-        To check sanity of the algorithm, flag is used to verify that there is exactly one place where TYPE could match.
-        Violation of this raises RuntimeError.
-        Args:
-            line (str): meaningful line of _LINTER_OUTPUT used
 
         Returns:
-            dictionary: error in format suitable for EDUKATE platform
+            String linter output of the R linter.
         """
-        dict = {"file_path": "path to file", "line_number": 0, "type": "type of error", "info": "error message"}
-        data = line.split(':')
-        data = [x.strip() for x in data]
-        path = ''
-        message_type = ''
-        message = ''
-        line_number = 0
-        column_number = 0
+        file_to_lint = abspath(file_to_lint)
+        if not Path(file_to_lint).is_file():
+            raise FileNotFoundError(file_to_lint)
 
-        flag = False
-        for index in range(len(data)):
-            if (data[index] == 'style' or data[index] == 'error' or data[index] == 'warning'):
-                if flag:
-                    raise RuntimeError('Two different message types in output line: ' + line)
-                else:
-                    flag = True
+        command = ['Rscript', 'lint_rfile.R', file_to_lint]
+        return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
-                message_type = data[index]
-                column_number = int(data[index - 1])
-                line_number = int(data[index - 2])
-                for concat_path_iter in range(index - 2):
-                    path += data[concat_path_iter]
-                for concat_msg_iter in range(index + 1, len(data)):
-                    message += data[concat_msg_iter]
-
-        if not flag:
-            raise RuntimeError('No message type in output line: ' + line)
-
-        dict["file_path"] = path
-        dict["line_number"] = line_number
-        dict["type"] = message_type
-        dict["info"] = message
-        dict["column_number"] = column_number
-        return dict
-
-    @staticmethod
-    def _errors_list_from_linter_output():
+    def _errors_list_from_linter_output(self, linted_file, linter_output):
         """
-        Parses file _LINTER_OUTPUT and returns a list of errors.
-
-        Uses the fact that each error is displayed in exactly three lines.
+        Parses the multiline string `linter_output` and returns a list of errors.
 
         Returns:
-            list of errors in format suitable for EDUKATE platform
+            A list of dictionaries detailing errors in a format suitable for the EDUKATE platform
         """
-        errors = []
-        with open(Linter._LINTER_OUTPUT) as linted_file:
-            content = linted_file.readlines()
-            for line in range(len(content)):
-                if line % 3 == 0:
-                    errors.append(Linter._linter_output_line_to_error_dictionary(content[line]))
+        linted_file = abspath(linted_file)
+        err_line_regex = (
+            rf"^(?P<path>{re.escape(linted_file)}):"
+            r"(?P<line>\d+):"
+            r"(?P<col>\d+): "
+            r"(?P<type>style|warning|error): "
+            r"(?P<msg>.*)$"
+        )
 
-        return errors
+        def create_err_dict(line_match):
+            ret = {}
+            ret["file_path"] = line_match.group('path')
+            ret["line_number"] = line_match.group('line')
+            ret["type"] = line_match.group('type')
+            ret["info"] = line_match.group('msg')
+            ret["column_number"] = line_match.group('col')
+            return ret
 
-    @staticmethod
-    def _clear_linter_output():
+        parsed_lines = re.finditer(err_line_regex, linter_output, re.M)
+        errors_list = [create_err_dict(line) for line in parsed_lines]
+
+        return errors_list
+
+    def lint(file_to_lint):
         """
-        Clearing after the script.
+        Uses a separate R script to make use of 'lintr' library from that language.
 
-        Returns:
-            None
-        """
-        os.remove(Linter._LINTER_OUTPUT)
-        return None
+        Invokes that script to produce output in stdout captured by subprocess,
+        and parses that output to produce comments in the right format.
 
-    @staticmethod
-    def _parse_linter_output(keep_output):
-        """
-        Parses the linter output to a JSON format.
-
-        Args:
-            keep_output (bool): whether to keep the lint in plaintext (_LINTER_OUTPUT)
-        Returns:
-            JSON object: a JSON describing errors in format suitable for EDUKATE platform
-        """
-        out = {"runners": [
-            {"errors": [], "score": 1, "runner_key": "Hadley Wickham's R Style Guide"}
-        ]}
-
-        errors_list = Linter._errors_list_from_linter_output()
-        out["runners"][0]["errors"] = errors_list
-        out["runners"][0]["score"] = Linter._score_formula(errors_list)
-
-        if not keep_output:
-            Linter._clear_linter_output()
-
-        return json.dumps(out)
-
-    @staticmethod
-    def lint(filename, keep_output=False):
-        """
-        Uses a separate R script to make use of 'lintr' library from that language and perform static code analysis.
-
-        Invokes that script to produce temporary _LINTER_OUTPUT,
-        parses that output to produce comments in the right format,
-        and cleans _LINTER_OUTPUT if desired.
         Args:
             filename: path to file to produce analysis for.
             keep_output (bool): whether to keep the lint in plaintext (_LINTER_OUTPUT)
@@ -173,9 +87,19 @@ class Linter:
         Returns:
             JSON object: a JSON describing errors in format suitable for EDUKATE platform
         """
-        Linter._invoke_rscript(filename)
-        return Linter._parse_linter_output(keep_output)
+        lint_output = Linter._invoke_lintr(file_to_lint)
+
+        out = {"runners": [
+            {"errors": [], "score": 1.0, "runner_key": "Hadley Wickham's R Style Guide"}
+        ]}
+
+        errors_list = Linter._errors_list_from_linter_output(file_to_lint, lint_output)
+
+        out["runners"][0]["errors"] = errors_list
+        out["runners"][0]["score"] = Linter._score_file_by_errors(errors_list)
+
+        return json.dumps(out)
 
 
-print(Linter.lint(filename='linter/example_linter_input.R', keep_output=False))
-quit()
+if __name__ == '__main__':
+    print(Linter.lint("example_linter_input.R"))
