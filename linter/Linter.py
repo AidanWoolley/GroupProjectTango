@@ -1,17 +1,14 @@
 """The class to perform static analysis of R code."""
-import os
 import subprocess
 import json
 import re
+from os.path import abspath
 from pathlib import Path
 __author__ = 'Kacper Walentynowicz'
 
 
 class Linter:
     """The class to perform static analysis of R code."""
-    def __init__(self, file_to_lint):
-        """The class to perform static analysis of R code."""
-        self.file_to_lint = os.path.abspath(file_to_lint)
 
     @staticmethod
     def _score_file_by_errors(errors):
@@ -28,7 +25,8 @@ class Linter:
         """
         return max(0, 1.0 - len(errors) * 0.05)
 
-    def _invoke_lintr(self):
+    @staticmethod
+    def _invoke_lintr(file_to_lint):
         """
         Invokes the R  linter script for `self.file_to_lint`.
 
@@ -38,21 +36,23 @@ class Linter:
         Returns:
             String linter output of the R linter.
         """
-        if not Path(self.file_to_lint).is_file():
-            raise FileNotFoundError(self.file_to_lint)
+        file_to_lint = abspath(file_to_lint)
+        if not Path(file_to_lint).is_file():
+            raise FileNotFoundError(file_to_lint)
 
-        command = ['Rscript', 'lint_rfile.R', self.file_to_lint]
+        command = ['Rscript', 'lint_rfile.R', file_to_lint]
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
-    def _errors_list_from_linter_output(self, linter_output):
+    def _errors_list_from_linter_output(self, linted_file, linter_output):
         """
         Parses the multiline string `linter_output` and returns a list of errors.
 
         Returns:
             A list of dictionaries detailing errors in a format suitable for the EDUKATE platform
         """
+        linted_file = abspath(linted_file)
         err_line_regex = (
-            rf"^(?P<path>{re.escape(self.file_to_lint)}):"
+            rf"^(?P<path>{re.escape(linted_file)}):"
             r"(?P<line>\d+):"
             r"(?P<col>\d+): "
             r"(?P<type>style|warning|error): "
@@ -73,7 +73,7 @@ class Linter:
 
         return errors_list
 
-    def lint(self):
+    def lint(file_to_lint):
         """
         Uses a separate R script to make use of 'lintr' library from that language.
 
@@ -87,13 +87,13 @@ class Linter:
         Returns:
             JSON object: a JSON describing errors in format suitable for EDUKATE platform
         """
-        lint_output = self._invoke_lintr()
+        lint_output = Linter._invoke_lintr(file_to_lint)
 
         out = {"runners": [
             {"errors": [], "score": 1.0, "runner_key": "Hadley Wickham's R Style Guide"}
         ]}
 
-        errors_list = self._errors_list_from_linter_output(lint_output)
+        errors_list = Linter._errors_list_from_linter_output(file_to_lint, lint_output)
 
         out["runners"][0]["errors"] = errors_list
         out["runners"][0]["score"] = Linter._score_file_by_errors(errors_list)
@@ -102,4 +102,4 @@ class Linter:
 
 
 if __name__ == '__main__':
-    print(Linter("example_linter_input.R").lint())
+    print(Linter.lint("example_linter_input.R"))
