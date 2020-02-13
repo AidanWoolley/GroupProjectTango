@@ -5,3 +5,7 @@ multiply <- function(start) {
 decrement <- function(start) {
     return(start - 1)
 }
+
+increment <- function(start) {
+	stop("No!")
+}

@@ -12,6 +12,7 @@ testMultiplyZero <- function() {
 }
 
 testMultiplyOne <- function() {
+	tdk_test_description <- "testing multiplication by 1"
 	tdk_tested_name <- "multiply"
 
     result <- multiply(1)
@@ -22,7 +23,7 @@ testMultiplyOne <- function() {
 
 testMultiplyType <- function() {
 	# Basically annotations
-	tdk_function_tested = "multiply"
+	tdk_tested_name = "multiply"
 	tkd_test_description = "check if return type of multiply is correct"
 	# Actual code
 	result <- multiply(as.integer(1))

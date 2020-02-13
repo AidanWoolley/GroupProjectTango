@@ -2,15 +2,23 @@ source("src/calculate.R")
 source("test_tools.R")
 
 testDecrementZero <- function() {
-    result <- decrement(0)
+	tdk_tested_name <- "decrement"
+	tdk_test_description <- "testing whether decrementing 0 yields -1"
+
+    result <- tdk_run(decrement, 0)
 	assert_equals(result, -1)
-	tdk_return()
+
+	return(tdk_return())
 }
 
 testDecrementOne <- function() {
-    result <- decrement(1)
+	tdk_tested_name <- "decrement"
+	tdk_test_description <- "testing whether decrementing 1 yields 0"
+
+    result <- tdk_run(decrement, 1)
 	assert_equals(result, 0)
-	tdk_return()
+
+	return(tdk_return())
 }
 
 .tests = c(testDecrementZero, testDecrementOne)
