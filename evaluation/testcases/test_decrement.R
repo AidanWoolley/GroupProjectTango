@@ -3,12 +3,14 @@ source("test_tools.R")
 
 testDecrementZero <- function() {
     result <- decrement(0)
-    return(testEquals(result, -1, "decrement", "testing decrementing zero"))
+	assert_equals(result, -1)
+	tdk_return()
 }
 
 testDecrementOne <- function() {
     result <- decrement(1)
-    return(testEquals(result, 0, "decrement"))
+	assert_equals(result, 0)
+	tdk_return()
 }
 
 .tests = c(testDecrementZero, testDecrementOne)

@@ -22,57 +22,21 @@ for (current_test_file in test_files) {
 	print(c("File: ", current_test_file))
 	for (current_test in .tests) {
 		test_result <- current_test()
-		print(test_result$passed)
 		# success
-		if (test_result$passed == TRUE) {
-			new_entry <- list(
-				test_name = "name of test function",
-				# TODO: test if empty
-				test_description = test_result$test_description,
-				file_path = "path to file being tested (not the test file)",
-				test_type = "primary",
-				# TODO: test if empty
-				function_tested__name = test_result$function_tested,
-				function_tested__description = "description of tested function"
-			)
-			output_json$runners$successes[[num_success]] <- new_entry
+		if (test_result$status == 0) {
+			output_json$runners$successes[[num_success]] <- test_result$data
 			num_success = num_success + 1
 		}
 		# failure
-		else if (test_result$passed == FALSE) {
+		else if (test_result$status == 1) {
 			output_json[["passed"]] = FALSE
-			new_entry <- list(
-				info = "type of assertion that failed",
-				details = "stacktrace of failed assertion",
-				test_name = "name of test function",
-				# TODO: test if empty
-				test_description = test_result$test_description,
-				file_path = "path to file being tested (not the test file)",
-				test_type = "primary",
-				# TODO: test if empty
-				function_tested__name = test_result$function_tested,
-				function_tested__description = "description of tested function"
-			)
-			output_json$runners$failures[[num_fail]] <- new_entry
+			output_json$runners$failures[[num_fail]] <- test_result$data
 			num_fail = num_fail + 1
 		}
 		# error
 		else {
 			output_json[["passed"]] = FALSE
-			new_entry <- list(
-				info = "type and message of occured exception",
-				details = "stacktrace of occured exception",
-				test_name = "name of test function",
-				# TODO: test if empty
-				test_description = test_result$test_description,
-				file_path = "path to file being tested (not the test file)",
-				test_type = "primary (just hard code it as primary for now)",
-				# TODO: test if empty
-				function_tested__name = test_result$function_tested,
-				function_tested__description = "description of tested function, empty string if not found",
-				line_number = 0
-			)
-			output_json$runners$errors[[num_error]] <- new_entry
+			output_json$runners$errors[[num_error]] <- test_result$data
 			num_error = num_error + 1
 		}
 	}
