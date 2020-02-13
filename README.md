@@ -5,3 +5,4 @@ An automatic code assessment tool for R code for CambridgeSpark
 R dependencies
 
  - rjson
+ - gtools
