@@ -9,7 +9,7 @@ RUN apt-get update && \
     apt-get install -y libcurl4-openssl-dev && \
     apt-get install -y libssl-dev
 
-RUN Rscript -e "install.packages('lintr')"
+RUN Rscript -e "install.packages(c('lintr', 'rjson'))"
 
 COPY . /home/tango
 WORKDIR /home/tango
