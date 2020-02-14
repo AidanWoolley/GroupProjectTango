@@ -72,7 +72,6 @@ class Linter:
         parsed_lines = re.finditer(err_line_regex, linter_output, re.M)
         errors_list = [create_err_dict(line) for line in parsed_lines]
 
-        #replace annoying u\2018 and u\2019 character Python does not deal with properly
         for error in errors_list:
             error["info"] = error["info"].replace("\u2018", "'").replace("\u2019", "'")
 
