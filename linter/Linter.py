@@ -40,7 +40,7 @@ class Linter:
         if not Path(file_to_lint).is_file():
             raise FileNotFoundError(file_to_lint)
 
-        command = ['Rscript', 'lint_rfile.R', file_to_lint]
+        command = ['Rscript', 'linter/lint_rfile.R', file_to_lint]
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
     @staticmethod
@@ -72,6 +72,10 @@ class Linter:
         parsed_lines = re.finditer(err_line_regex, linter_output, re.M)
         errors_list = [create_err_dict(line) for line in parsed_lines]
 
+        #replace annoying u\2018 and u\2019 character Python does not deal with properly
+        for error in errors_list:
+            error["info"] = error["info"].replace("\u2018", "'").replace("\u2019", "'")
+
         return errors_list
 
     @staticmethod
@@ -90,18 +94,12 @@ class Linter:
             JSON object: a JSON describing errors in format suitable for EDUKATE platform
         """
         lint_output = Linter._invoke_lintr(file_to_lint)
-
         out = {"runners": [
             {"errors": [], "score": 1.0, "runner_key": "Hadley Wickham's R Style Guide"}
         ]}
 
         errors_list = Linter._errors_list_from_linter_output(file_to_lint, lint_output)
-
         out["runners"][0]["errors"] = errors_list
         out["runners"][0]["score"] = Linter._score_file_by_errors(errors_list)
 
         return json.dumps(out)
-
-
-if __name__ == '__main__':
-    print(Linter.lint("example_linter_input.R"))
