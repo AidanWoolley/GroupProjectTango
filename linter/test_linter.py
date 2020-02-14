@@ -5,7 +5,7 @@ from linter.Linter import Linter
 import os
 import json
 PATH_TO_FILES = os.getcwd() + "/linter/testprograms/"
-print(PATH_TO_FILES)
+
 
 def _ordered(obj):
     if isinstance(obj, dict):
@@ -65,6 +65,7 @@ def test_linter_includes_compile_errors():
     lint_result = json.loads(Linter.lint("linter/testprograms/compilation_error.R"))
     assert _ordered(lint_result) == _ordered(desired_result)
 
+
 def test_linter_includes_warnings():
     """
     Checks that linter includes code warnings.
@@ -77,10 +78,11 @@ def test_linter_includes_warnings():
         "line_number": "2",
         "type": "warning",
         "info": "local variable 'some_variable' assigned but may not be used",
-        "column_number":"3"}], "score": 0.95, "runner_key": "Hadley Wickham's R Style Guide"}]}
+        "column_number": "3"}], "score": 0.95, "runner_key": "Hadley Wickham's R Style Guide"}]}
 
     lint_result = json.loads(Linter.lint("linter/testprograms/warning.R"))
     assert _ordered(lint_result) == _ordered(desired_result)
+
 
 def test_linter_returns_score_0_when_many_errors():
     """
