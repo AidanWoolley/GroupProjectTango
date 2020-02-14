@@ -1,6 +1,4 @@
-"""
-Unit tests for Linter.py.
-"""
+"""Unit tests for Linter.py."""
 from linter.Linter import Linter
 import os
 import json
