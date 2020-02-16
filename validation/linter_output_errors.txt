@@ -1,0 +1,35 @@
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:3:3: warning: local variable 'one.plus.one' assigned but may not be used
+
+  one.plus.one <- oen + 1
+
+  ^~~~~~~~~~~~
+
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:3:19: warning: no visible binding for global variable 'oen'
+
+  one.plus.one <- oen + 1
+
+                  ^~~
+
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:4:11: warning: local variable 'newVar' assigned but may not be used
+
+  four <- newVar <- matrix(1:10,nrow = 2)
+
+          ^~~~~~
+
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:8:3: warning: local variable 'three' assigned but may not be used
+
+  three <- two+ 1
+
+  ^~~~~
+
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:8:12: warning: no visible binding for global variable 'two'
+
+  three <- two+ 1
+
+           ^~~
+
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:12:1: error: unexpected end of input
+
+{
+
+^
