@@ -24,3 +24,9 @@ This starts it in interactive mode, so you can run commands and test your code i
 R dependencies
  - rjson
  - gtools
+
+## Run demo
+1. build the docker image from the project root.
+2. Create an output folder
+3. Run the command `docker run --rm --mount type=bind,source="<path to output folder>,target=/home/tango/out tango`
+4. Observe the outputted JSON files in the output directory

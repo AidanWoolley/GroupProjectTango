@@ -9,11 +9,10 @@ RUN apt-get update && \
     apt-get install -y libcurl4-openssl-dev && \
     apt-get install -y libssl-dev
 
-RUN Rscript -e "install.packages(c('lintr', 'rjson'))"
+RUN Rscript -e "install.packages(c('lintr', 'rjson', 'gtools'))"
 
-COPY . /home/tango
+COPY ./docker_env /home/tango
 WORKDIR /home/tango
+RUN mkdir out
 
-# TODO: USER someone
-
-CMD ["python3", "Linter.py"]
+CMD ["python3", "run_tests.py"]

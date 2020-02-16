@@ -36,7 +36,8 @@ class Validator(Linter):
     @staticmethod
     def _invoke_lintr_failure(file_to_check, restricted_functions):
         """
-        Specialized lintr call to only highlight the use of restricted functions
+        Specialized lintr call to only highlight the use of restricted functions.
+
         :param file_to_check: the file to check use of any restricted functions in.
         :param restricted_functions: the list of restricted functions for this file
         :return: returns the output from invoking the file 'failure_linter.R' on file
@@ -226,9 +227,9 @@ class Validator(Linter):
         out = {
             "runners": [
                 {
-                    "successes":[],
-                    "failures":[],
-                    "errors":[],
+                    "successes": [],
+                    "failures": [],
+                    "errors": [],
                     "runner_key":"r:validate"
                 }
             ],
@@ -244,8 +245,7 @@ class Validator(Linter):
             out["runners"][0]["failures"].extend(failures)
             out["runners"][0]["errors"].extend(errors)
 
-        if (len(out["runners"][0]["errors"]) == 0 and
-            len(out["runners"][0]["failures"]) == 0):
+        if (len(out["runners"][0]["errors"]) == 0 and len(out["runners"][0]["failures"]) == 0):
             out["passed"] = True
 
         return json.dumps(out, indent=2)

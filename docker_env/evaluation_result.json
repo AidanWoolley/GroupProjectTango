@@ -1,0 +1,69 @@
+{
+    "passed": false,
+    "runners": [
+        {
+            "successes": [
+                {
+                    "test_name": "",
+                    "test_description": "testing multiplication by zero",
+                    "file_path": "",
+                    "test_type": "primary",
+                    "function_tested__name": "multiply",
+                    "function_tested__description": ""
+                },
+                {
+                    "test_name": "",
+                    "test_description": "testing multiplication by 1",
+                    "file_path": "",
+                    "test_type": "primary",
+                    "function_tested__name": "multiply",
+                    "function_tested__description": ""
+                },
+                {
+                    "test_name": "",
+                    "test_description": "testing whether decrementing 1 yields 0",
+                    "file_path": "",
+                    "test_type": "primary",
+                    "function_tested__name": "decrement",
+                    "function_tested__description": ""
+                }
+            ],
+            "failures": [
+                {
+                    "test_name": "",
+                    "test_description": "",
+                    "file_path": "",
+                    "test_type": "primary",
+                    "function_tested__name": "multiply",
+                    "function_tested__description": "",
+                    "info": "wrong type",
+                    "details": ""
+                },
+                {
+                    "test_name": "",
+                    "test_description": "testing whether decrementing 0 yields -1",
+                    "file_path": "",
+                    "test_type": "primary",
+                    "function_tested__name": "decrement",
+                    "function_tested__description": "",
+                    "info": "unexpected result",
+                    "details": ""
+                }
+            ],
+            "errors": [
+                {
+                    "test_name": "",
+                    "test_description": "tests if increment works properly",
+                    "file_path": "",
+                    "test_type": "primary",
+                    "function_tested__name": "increment",
+                    "function_tested__description": "",
+                    "info": "",
+                    "details": ""
+                }
+            ],
+            "tests_run": 6,
+            "runner_key": "tests"
+        }
+    ]
+}
