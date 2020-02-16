@@ -19,3 +19,8 @@ docker run -it tango
 This starts it in interactive mode, so you can run commands and test your code in the container.
 
 **TODO**: Figure out how the container will acquire tests and student code and how the container should handle these inputs and outputs.
+
+## Dependencies
+R dependencies
+ - rjson
+ - gtools
