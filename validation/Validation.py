@@ -76,7 +76,7 @@ class Validator(Linter):
         file_path = abspath(file)
         file_text = Validator.__read_file(file)
 
-        parsed_lines = re.finditer(r"^library\((?P<lib>.+)\)$", file_text, re.M)
+        parsed_lines = re.finditer(r"^library\(?[\"|\'](?P<lib>.+)?[\"|\']\)$", file_text, re.M)
 
         restricted_libs_used = set()
         failures = []
