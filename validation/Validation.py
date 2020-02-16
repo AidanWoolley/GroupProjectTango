@@ -1,4 +1,4 @@
-"""This class takes the static analysis from produces output in relevant format"""
+"""This class takes the static analysis from produces output in relevant format."""
 import yaml
 import re
 import json
@@ -9,14 +9,16 @@ __author__ = "Anish_Das_ad945"
 
 
 class Validator(Linter):
-    """The class uses the static analysis performed by Linter to produce required JSON"""
+    """The class uses the static analysis performed by Linter to produce required JSON."""
 
     @staticmethod
     def _read_config(config_yaml_file):
         """
         Parses the yaml file using the pyyaml library
+
         :param config_yaml_file: the relative path to the config.yaml file
-        :return: dictionary containing the configuration
+
+        :return: dictionary containing the configuration.
         """
         with open(config_yaml_file, "r") as f:
             config = yaml.safe_load(f)
@@ -33,8 +35,11 @@ class Validator(Linter):
     def _check_failures(file, restricted_libraries):
         """
         Checks for any failures in the code i.e. does it try to use any restricted librarires
+
         :param file: the file to check for restricted libraries
+
         :param restricted_libraries: the list of restricted libraries for the file
+
         :return: returns a list of dictionaries of the required format containing "type", "info"
         and "file_path".
         """
@@ -69,7 +74,9 @@ class Validator(Linter):
     def _check_errors(errors_list):
         """
         Parses error from static analysis to check for syntax errors
+
         :param errors_list: list of errors found by the static analysis tool
+
         :return: returns a list of dictionaries of the required type with "type", "info",
         "file_path", "details" & "line_number" as the keys.
         """
@@ -104,10 +111,14 @@ class Validator(Linter):
         """
         This function will validate a single file checking for errors (syntactic) and failures.
         If there are none then it assigns the file a success.
+
         :param file_to_validate: the relative path to the file to validate
+
         :param linter_output: the output from the lintr package from R
+
         :param restricted_libraries: the list of restricted libraries for the file as deciphered
         from the config.yaml file
+
         :return: it returns a tuple containing the successes, failures, and errors in the file
         if a file has no errors then it gets the success of having no errors and if a file has no
         failures i.e. no restricted use then it gets another success item.
@@ -136,8 +147,10 @@ class Validator(Linter):
         """
         This function will decipher the requirements of the test and run validation test on each
         of the required files.
+
         :param config_file: a "config.yaml" file used to define which files to be tested and which
         funcitons/libraries are restricted
+
         :return: returns a json with the keys passed & runners: {runner_key, errors, failures &
         successes} to be analysed by the existing software later on.
         """
