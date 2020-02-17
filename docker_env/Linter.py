@@ -40,7 +40,7 @@ class Linter:
         if not Path(file_to_lint).is_file():
             raise FileNotFoundError(file_to_lint)
 
-        command = ['Rscript', 'linter/lint_rfile.R', file_to_lint]
+        command = ['Rscript', 'lint_rfile.R', file_to_lint]
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
     @staticmethod

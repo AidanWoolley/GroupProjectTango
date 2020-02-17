@@ -3,6 +3,7 @@ multiply <- function(start) {
 }
 
 decrement <- function(start) {
+    x = start
     return(start - 1)
 }
 

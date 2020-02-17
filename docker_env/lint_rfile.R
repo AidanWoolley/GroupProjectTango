@@ -1,3 +1,3 @@
 library('lintr')
-l <- with_default(default = default_linters, object_usgae_linter=NULL)
+l <- with_defaults(default = default_linters, object_usage_linter=NULL)
 print(lint(commandArgs(trailingOnly = TRUE)[1], linters = l))

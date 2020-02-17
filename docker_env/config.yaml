@@ -1,0 +1,6 @@
+files:
+    - src/calculate.R
+restricted_libraries:
+    src/calculate.R: []
+restricted_functions:
+    src/calculate.R: []
