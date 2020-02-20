@@ -26,9 +26,9 @@ class Linter:
         return max(0, 1.0 - len(errors) * 0.05)
 
     @staticmethod
-    def _invoke_lintr(file_to_lint):
+    def _invoke_lintr(object_to_lint):
         """
-        Invokes the R  linter script for `self.file_to_lint`.
+        Invokes the R  linter script for `self.object_to_lint`.
 
         Args:
             None
@@ -36,11 +36,11 @@ class Linter:
         Returns:
             String linter output of the R linter.
         """
-        file_to_lint = abspath(file_to_lint)
-        if not Path(file_to_lint).is_file():
-            raise FileNotFoundError(file_to_lint)
+        object_to_lint = abspath(object_to_lint)
+        if not Path(object_to_lint).is_file():
+            raise FileNotFoundError(object_to_lint)
 
-        command = ['Rscript', 'linter/lint_rfile.R', file_to_lint]
+        command = ['Rscript', 'linter/lint_rfile.R', object_to_lint]
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
     @staticmethod
@@ -78,27 +78,48 @@ class Linter:
         return errors_list
 
     @staticmethod
-    def lint(file_to_lint):
+    def lint(object_to_lint):
         """
+        Lints an object giving error, warning and style comments.
         Uses a separate R script to make use of 'lintr' library from that language.
 
         Invokes that script to produce output in stdout captured by subprocess,
         and parses that output to produce comments in the right format.
 
         Args:
-            filename: path to file to produce analysis for.
-            keep_output (bool): whether to keep the lint in plaintext (_LINTER_OUTPUT)
+            object_to_lint: object to produce analysis for.
+            A single file or a list of files is currently supported.
 
         Returns:
             JSON object: a JSON describing errors in format suitable for EDUKATE platform
+            Example given by the clients:
+            {
+                "runners": [
+                    {
+                        "errors": [
+                            {
+                                "file_path": "path to file",
+                                "line_number": 0,
+                                "type": "type of error (eg. bad spacing etc.)",
+                                "info": "error message"
+                            }
+                        ],
+                        "score": 0.95,
+                        "runner_key": "quality checker name (eg. pep8, pylint, checkstyle, etc.)"
+                    }
+                ]
+            }
         """
-        lint_output = Linter._invoke_lintr(file_to_lint)
-        out = {"runners": [
-            {"errors": [], "score": 1.0, "runner_key": "Hadley Wickham's R Style Guide"}
-        ]}
+        if type(object_to_lint) is not list:
+            object_to_lint = [object_to_lint]
 
-        errors_list = Linter._errors_list_from_linter_output(file_to_lint, lint_output)
-        out["runners"][0]["errors"] = errors_list
-        out["runners"][0]["score"] = Linter._score_file_by_errors(errors_list)
+        out = {"runners": []}
+        for index in range(len(object_to_lint)):
+            out["runners"].append({})
+            lint_output = Linter._invoke_lintr(object_to_lint[index])
+            errors_list = Linter._errors_list_from_linter_output(object_to_lint[index], lint_output)
+            out["runners"][index]["errors"] = errors_list
+            out["runners"][index]["score"] = Linter._score_file_by_errors(errors_list)
+            out["runners"][index]["runner_key"] = "Hadley Wickham's R Style Guide"
 
         return json.dumps(out)
