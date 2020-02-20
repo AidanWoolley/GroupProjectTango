@@ -80,6 +80,8 @@ class Linter:
     @staticmethod
     def lint(object_to_lint):
         """
+        The function to perform static analysis of R code.
+
         Lints an object giving error, warning and style comments.
         Uses a separate R script to make use of 'lintr' library from that language.
 
