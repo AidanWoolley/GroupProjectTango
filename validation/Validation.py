@@ -28,6 +28,16 @@ class Validator(Linter):
         return config
 
     @staticmethod
+    def _get_libraries():
+        """
+        Runs an R script to return all the installed.packages() on the machine.
+
+        :return: a list of all the available libraries that the user can use.
+        """
+        command = ["Rscript", "get_libraries.R"]
+        return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
+
+    @staticmethod
     def __read_file(file_to_validate):
         with open(file_to_validate, "r") as f:
             out = f.read()
@@ -37,26 +47,57 @@ class Validator(Linter):
     def _invoke_lintr_failure(file_to_check, restricted_functions):
         """
         Specialized lintr call to only highlight the use of restricted functions
+
         :param file_to_check: the file to check use of any restricted functions in.
-        :param restricted_functions: the list of restricted functions for this file
+
+        :param restricted_functions: the list of restricted functions for this file now passed
+        into the set of command line arguments
+
         :return: returns the output from invoking the file 'failure_linter.R' on file
         """
-        with open("failure_linter.R", "w") as f:
-            rf = '="restricted function", '.join(restricted_functions)
-            c = f'''library('lintr')
-                my_undesirable_functions <- c({rf})
-                l <- undesirable_function_linter(fun=my_undesirable_functions)    
-                print(lint(commandArgs(trailingOnly = TRUE)[1], linters=l))
-                '''
-            f.write(c)
 
         file_to_check = abspath(file_to_check)
 
         if not Path(file_to_check).is_file():
             raise FileNotFoundError(file_to_check)
 
-        command = ['Rscript', 'failure_linter.R', file_to_check]
+        command = ['Rscript', 'failure_linter.R', file_to_check, *restricted_functions]
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode('utf-8')
+
+    @staticmethod
+    def __get_used_libraries(file_text):
+        """
+        Goes through the file to extract quite basically the list of all the libraries that
+        the file is using. It relies on regex to do so.
+
+        :param file_text: The text of the file as in the string which is the file of R that we
+        want to run.
+
+        :return: A list of strings/libraries (that should be actual libraries) from the
+        file_text.
+        """
+        file_text = file_text.split("\n")
+        r1 = r"library\(\"(?P<lib>.+)\"\)"
+        r2 = r"library\(\'(?P<lib>.+)\'\)"
+        r3 = r"library\((?P<lib>.+)\)"
+
+        libs_used = set()
+
+        for i, line in enumerate(file_text):
+            match = re.match(r1, line, re.M)
+            if not match:
+                match = re.match(r2, line, re.M)
+            if not match:
+                match = re.match(r3, line, re.M)
+
+            if not match:
+                continue
+
+            libs_used.add((match.group('lib'), i))
+
+
+
+        return libs_used
 
     @staticmethod
     def _check_failures(file, restricted_libraries, restricted_functions):
@@ -73,17 +114,17 @@ class Validator(Linter):
         and "file_path".
         """
 
-        file_path = abspath(file)
+
+
+        # parsed_lines = re.finditer(r"^library\(?[\"|\'](?P<lib>.+)?[\"|\']\)$", file_text, re.M)
+
         file_text = Validator.__read_file(file)
+        libs_used = Validator.__get_used_libraries(file_text)
 
-        parsed_lines = re.finditer(r"^library\(?[\"|\'](?P<lib>.+)?[\"|\']\)$", file_text, re.M)
-
-        restricted_libs_used = set()
         failures = []
+        restricted_libs_used = set()
 
-        for line_match in parsed_lines:
-            lib = line_match.group('lib')
-
+        for lib, _ in libs_used:
             if lib in restricted_libraries:
                 restricted_libs_used.add(lib)
 
@@ -91,9 +132,10 @@ class Validator(Linter):
             item = {
                 "type": "restricted library",
                 "info": f"library {lib} is not allowed in this file",
-                "file_path": file_path
+                "file_path": abspath(file)
             }
             failures.append(item)
+
 
         # linter_output = Validator._invoke_lintr_failure(file, restricted_functions)
         with open("linter_output_failures.txt", "r") as f:
@@ -109,7 +151,7 @@ class Validator(Linter):
                 item = {
                     "type": "restricted function",
                     "info": f"function {func_match.group('func')} is not allowed in this file",
-                    "file_path": file_path
+                    "file_path": abspath(file)
                 }
 
                 failures.append(item)
@@ -119,9 +161,12 @@ class Validator(Linter):
     @staticmethod
     def _invoke_lintr_error(file_to_check):
         """
-        Invoking linter with just the object_usage_linter argument to get just the syntax errors
-        :param file_to_check: the relative/absolute path to the file to check
-        :return: the output from the linter
+        Invoking linter with just the object_usage_linter argument to get just the syntax
+        errors.
+
+        :param file_to_check: the relative/absolute path to the file to check.
+
+        :return: the output from the linter.
         """
         file_to_check = abspath(file_to_check)
         if not Path(file_to_check).is_file():
@@ -131,25 +176,56 @@ class Validator(Linter):
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
     @staticmethod
-    def _check_errors(errors_list):
+    def _check_errors(file, errors_list, libraries):
         """
-        Parses error from static analysis to check for syntax errors
+        Parses error from static analysis to check for syntax errors.
 
-        :param errors_list: list of errors found by the static analysis tool
+        :param errors_list: list of errors found by the static analysis tool.
+
+        :param libraries: the list of available libraries in the form of a string list.
 
         :return: returns a list of dictionaries of the required type with "type", "info",
         "file_path", "details" & "line_number" as the keys.
         """
 
         out = []
-        for error in errors_list:
-            temp = {}
 
-            temp["type"] = "syntax error"
-            temp["info"] = error["info"]
-            temp["file_path"] = error["file_path"]
-            temp["line_number"] = error["line_number"]
-            temp["details"] = ":".join([temp["file_path"],
+        file_text = Validator.__read_file(file)
+        libs_used = Validator.__get_used_libraries(file_text)
+
+        for lib, i in libs_used:
+            if lib in libraries:
+                continue
+
+            temp = {
+                "type": "unknown library",
+                "info": f"the library {lib} used in not known, perhaps there is spelling mistake",
+                "file_path": abspath(file),
+                "line_number": str(i+1),
+            }
+            temp["details"] = ": ".join([
+                temp["file_path"],
+                temp["line_number"],
+                temp["type"],
+                temp["info"]
+            ])
+
+            out.append(temp)
+
+        for error in errors_list:
+
+            if re.match(r"local variable \'.*\' assigned but may not be used",
+                        error["info"],
+                        re.M):
+                continue
+
+            temp = {
+                "type": "syntax error",
+                "info": error["info"],
+                "file_path": error["file_path"],
+                "line_number": error["line_number"]
+            }
+            temp["details"] = ": ".join([temp["file_path"],
                                         temp["line_number"],
                                         temp["type"],
                                         temp["info"]])
@@ -159,34 +235,35 @@ class Validator(Linter):
         return out
 
     @staticmethod
-    def validate_file(file_to_validate, restricted_libraries, restricted_functions):
+    def validate_file(file_to_validate, restricted_libraries, libraries, restricted_functions):
         """
         This function will validate a single file checking for errors (syntactic) and failures.
         If there are none then it assigns the file a success.
 
-        :param file_to_validate: the relative path to the file to validate
+        :param file_to_validate: the relative path to the file to validate.
 
         :param restricted_libraries: the list of restricted libraries for the file as deciphered
-        from the config.yaml file
+        from the config.yaml file.
+
+        :param libraries: the list of available libraries in the form of a string list.
 
         :param restricted_functions: the list of restricted functions for the file as deciphered
-        from the config.yaml file
+        from the config.yaml file.
 
         :return: it returns a tuple containing the successes, failures, and errors in the file
         if a file has no errors then it gets the success of having no errors and if a file has no
         failures i.e. no restricted use then it gets another success item.
         """
 
-        # remove the comment and remove what come after
+        # TODO: remove the comment and remove what come after
         # linter_output = Linter._invoke_lintr_error(file)
         with open("linter_output_errors.txt", "r") as f:
             linter_output = f.read()
-        # remove until here
 
         successes = []
 
         errors_list = Linter._errors_list_from_linter_output(file_to_validate, linter_output)
-        errors = Validator._check_errors(errors_list)
+        errors = Validator._check_errors(file_to_validate, errors_list, libraries)
 
         if len(errors) == 0:
             successes = [{
@@ -215,7 +292,7 @@ class Validator(Linter):
         of the required files.
 
         :param config_file: a "config.yaml" file used to define which files to be tested and which
-        funcitons/libraries are restricted
+        funcitons/libraries are restricted.
 
         :return: returns a json with the keys passed & runners: {runner_key, errors, failures &
         successes} to be analysed by the existing software later on.
@@ -235,10 +312,17 @@ class Validator(Linter):
             "passed": False
         }
 
+        # TODO: remove the reading file bit for invoke (_get_libraries)
+        # libraries = Validator._get_libraries()
+        with open("libraries.txt", "r") as f:
+            libraries = f.read()
+        libraries = libraries[5:-2]
+        libraries = libraries.split(",")
+
         for file in files:
             restricted_libraries = config["restricted_libraries"][file]
             restricted_functions = config["restricted_functions"][file]
-            args = [file, restricted_libraries, restricted_functions]
+            args = [file, restricted_libraries, libraries,  restricted_functions]
             successes, failures, errors = Validator.validate_file(*args)
             out["runners"][0]["successes"].extend(successes)
             out["runners"][0]["failures"].extend(failures)

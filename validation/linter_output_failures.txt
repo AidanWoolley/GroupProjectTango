@@ -1,11 +1,11 @@
-D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:7:3: warning: Function "print" is undesirable. As an alternative, restricted function.
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:8:3: warning: Function "print" is undesirable. As an alternative, restricted function.
 
   print(four)
 
   ^~~~~
 
-D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:12:1: error: unexpected end of input
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:12:12: error: unexpected end of input
 
-{
+{aa <- a + a
 
-^
+           ^

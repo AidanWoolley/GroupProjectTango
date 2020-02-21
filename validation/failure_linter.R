@@ -8,6 +8,6 @@ for (i in 2:length(args)) {
   my_undesirable_functions[[args[[i]]]] <- "restricted function"
 }
 
-undesirable_func_linter <- undesirable_function_linter(fun=my_undesirable_function)
+undesirable_func_linter <- undesirable_function_linter(fun=my_undesirable_functions)
 
 print(lint(fileName, linters=undesirable_func_linter))

@@ -16,20 +16,26 @@ D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:4:11: war
 
           ^~~~~~
 
-D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:8:3: warning: local variable 'three' assigned but may not be used
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:7:3: warning: local variable 'three' assigned but may not be used
 
   three <- two+ 1
 
   ^~~~~
 
-D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:8:12: warning: no visible binding for global variable 'two'
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:7:12: warning: no visible binding for global variable 'two'
 
   three <- two+ 1
 
            ^~~
 
-D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:12:1: error: unexpected end of input
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:8:6: warning: no visible binding for global variable 'txt'
 
-{
+  if(txt == 'hi') 4
 
-^
+     ^~~
+
+D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:12:12: error: unexpected end of input
+
+{aa <- a + a
+
+           ^
