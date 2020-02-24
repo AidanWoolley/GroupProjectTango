@@ -134,7 +134,8 @@ class Linter:
             lint_output = Linter._invoke_lintr(object_to_lint[index])
             errors_list = Linter._errors_list_from_linter_output(object_to_lint[index], lint_output)
             out["runners"][index]["errors"] = errors_list
-            out["runners"][index]["score"] = Linter._score_file_by_errors(errors_list, ignore_multiple=ignore_multiple_for_score)
+            out["runners"][index]["score"] = Linter._score_file_by_errors(errors_list,
+                                                                          ignore_multiple=ignore_multiple_for_score)
             out["runners"][index]["runner_key"] = "Hadley Wickham's R Style Guide"
 
         return json.dumps(out)

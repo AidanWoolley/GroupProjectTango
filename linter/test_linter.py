@@ -7,7 +7,8 @@ PATH_TO_FILES = os.getcwd() + "/linter/testprograms/"
 
 def _ordered(obj):
     """
-    Private helper function for checking equality of Python objects
+    Private helper function for checking equality of Python objects.
+
     Args:
         obj: object
 
