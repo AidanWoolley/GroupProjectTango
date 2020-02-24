@@ -6,6 +6,14 @@ PATH_TO_FILES = os.getcwd() + "/linter/testprograms/"
 
 
 def _ordered(obj):
+    """
+    Private helper function for checking equality of Python objects
+    Args:
+        obj: object
+
+    Returns:
+        obj: ordered representation of object obj
+    """
     if isinstance(obj, dict):
         return sorted((k, _ordered(v)) for k, v in obj.items())
     if isinstance(obj, list):
@@ -107,11 +115,23 @@ def test_linter_on_perfect_code():
     assert _ordered(lint_result) == _ordered(desired_result)
 
 
+def test_linter_correctly_ignores_multiple_similar_style_errors():
+    """
+    Checks that linter correctly ignores multiple similar style errors when the feature is enabled.
+
+    Returns:
+        None
+    """
+    lint_result = Linter.lint("linter/testprograms/zero.R", ignore_multiple_for_score=True)
+    dict_result = json.loads(lint_result)
+    assert dict_result["runners"][0]["score"] == 0.95
+
+
 test_linter_raises_error_if_filenotfound()
 test_linter_handles_files_with_special_characters()
 test_linter_includes_compile_errors()
 test_linter_includes_warnings()
 test_linter_returns_score_0_when_many_errors()
 test_linter_on_perfect_code()
-
+test_linter_correctly_ignores_multiple_similar_style_errors()
 print("SUCCESS")
