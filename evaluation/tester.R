@@ -1,4 +1,5 @@
 require('rjson')
+require('yaml')
 
 evaluator <- function(out_path) {
 	output_json <- list(
@@ -8,10 +9,11 @@ evaluator <- function(out_path) {
 	num_success <- 1
 	num_fail <- 1
 	num_error <- 1
-	test_files <- list.files(path="testcases")
-	for (current_test_file in test_files) {
-		# TODO: use something else
-		source(paste("testcases/", current_test_file, sep=""))
+
+	config_yaml <- read_yaml("config.yaml")
+
+	for (current_test_file in config_yaml[["tests"]]) {
+		source(current_test_file)
 
 		for (current_test in .tests) {
 			test_result <- current_test()
