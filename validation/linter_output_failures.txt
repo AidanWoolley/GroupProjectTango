@@ -3,9 +3,3 @@ D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:8:3: warn
   print(four)
 
   ^~~~~
-
-D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:12:12: error: unexpected end of input
-
-{aa <- a + a
-
-           ^

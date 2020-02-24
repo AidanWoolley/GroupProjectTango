@@ -1,0 +1,6 @@
+files:
+  - this_r_doesnt_exist.R
+restricted_functions:
+  this_r_doesnt_exist.R: []
+restricted_libraries:
+  this_r_doesnt_exist.R: []

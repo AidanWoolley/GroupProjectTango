@@ -1,0 +1,51 @@
+{
+  "runners": [
+    {
+      "successes": [],
+      "failures": [
+        {
+          "type": "restricted library",
+          "info": "library lintr is not allowed in this file",
+          "file_path": "D:\\Desktop\\Part1B\\GroupProject\\Tango\\validation\\example_linter_input.R"
+        },
+        {
+          "type": "restricted function",
+          "info": "function print is not allowed in this file",
+          "file_path": "D:\\Desktop\\Part1B\\GroupProject\\Tango\\validation\\example_linter_input.R"
+        }
+      ],
+      "errors": [
+        {
+          "type": "unknown library",
+          "info": "the library lintrr used in not known, perhaps there is spelling mistake",
+          "file_path": "D:\\Desktop\\Part1B\\GroupProject\\Tango\\validation\\example_linter_input.R",
+          "line_number": "1",
+          "details": "D:\\Desktop\\Part1B\\GroupProject\\Tango\\validation\\example_linter_input.R: 1: unknown library: the library lintrr used in not known, perhaps there is spelling mistake"
+        },
+        {
+          "type": "syntax error",
+          "info": "no visible binding for global variable 'oen'",
+          "file_path": "D:\\Desktop\\Part1B\\GroupProject\\Tango\\validation\\example_linter_input.R",
+          "line_number": "3",
+          "details": "D:\\Desktop\\Part1B\\GroupProject\\Tango\\validation\\example_linter_input.R: 3: syntax error: no visible binding for global variable 'oen'"
+        },
+        {
+          "type": "syntax error",
+          "info": "no visible binding for global variable 'two'",
+          "file_path": "D:\\Desktop\\Part1B\\GroupProject\\Tango\\validation\\example_linter_input.R",
+          "line_number": "7",
+          "details": "D:\\Desktop\\Part1B\\GroupProject\\Tango\\validation\\example_linter_input.R: 7: syntax error: no visible binding for global variable 'two'"
+        },
+        {
+          "type": "syntax error",
+          "info": "no visible binding for global variable 'txt'",
+          "file_path": "D:\\Desktop\\Part1B\\GroupProject\\Tango\\validation\\example_linter_input.R",
+          "line_number": "8",
+          "details": "D:\\Desktop\\Part1B\\GroupProject\\Tango\\validation\\example_linter_input.R: 8: syntax error: no visible binding for global variable 'txt'"
+        }
+      ],
+      "runner_key": "r:validate"
+    }
+  ],
+  "passed": false
+}

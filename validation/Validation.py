@@ -10,7 +10,7 @@ import subprocess
 __author__ = "Anish_Das_ad945"
 
 
-class Validator(Linter):
+class Validator():
     """The class uses the static analysis performed by Linter to produce required JSON."""
 
     @staticmethod
@@ -22,6 +22,11 @@ class Validator(Linter):
 
         :return: dictionary containing the configuration.
         """
+        file_path = abspath(config_yaml_file)
+
+        if not Path(file_path).is_file():
+            raise FileNotFoundError(config_yaml_file)
+
         with open(config_yaml_file, "r") as f:
             config = yaml.safe_load(f)
 
@@ -34,8 +39,8 @@ class Validator(Linter):
 
         :return: a list of all the available libraries that the user can use.
         """
-        command = ["Rscript", "get_libraries.R"]
-        return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
+        command = ["Rscript", abspath("get_libraries.R")]
+        return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode('utf-8')
 
     @staticmethod
     def __read_file(file_to_validate):
@@ -61,11 +66,11 @@ class Validator(Linter):
         if not Path(file_to_check).is_file():
             raise FileNotFoundError(file_to_check)
 
-        command = ['Rscript', 'failure_linter.R', file_to_check, *restricted_functions]
+        command = ['Rscript', abspath('failure_linter.R'), file_to_check, *restricted_functions]
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode('utf-8')
 
     @staticmethod
-    def __get_used_libraries(file_text):
+    def _get_used_libraries(file_text):
         """
         Goes through the file to extract quite basically the list of all the libraries that
         the file is using. It relies on regex to do so.
@@ -81,7 +86,7 @@ class Validator(Linter):
         r2 = r"library\(\'(?P<lib>.+)\'\)"
         r3 = r"library\((?P<lib>.+)\)"
 
-        libs_used = set()
+        libs_used = list()
 
         for i, line in enumerate(file_text):
             match = re.match(r1, line, re.M)
@@ -93,9 +98,10 @@ class Validator(Linter):
             if not match:
                 continue
 
-            libs_used.add((match.group('lib'), i))
-
-
+            lib = match.group('lib')
+            if lib != lib.strip():
+                lib = lib.strip().strip('\'').strip('\"')
+            libs_used.append((lib, i))
 
         return libs_used
 
@@ -119,7 +125,7 @@ class Validator(Linter):
         # parsed_lines = re.finditer(r"^library\(?[\"|\'](?P<lib>.+)?[\"|\']\)$", file_text, re.M)
 
         file_text = Validator.__read_file(file)
-        libs_used = Validator.__get_used_libraries(file_text)
+        libs_used = Validator._get_used_libraries(file_text)
 
         failures = []
         restricted_libs_used = set()
@@ -136,11 +142,9 @@ class Validator(Linter):
             }
             failures.append(item)
 
+        if len(restricted_functions) == 0: return failures
 
-        # linter_output = Validator._invoke_lintr_failure(file, restricted_functions)
-        with open("linter_output_failures.txt", "r") as f:
-            linter_output = f.read()
-        # only here because I can't run r directly
+        linter_output = Validator._invoke_lintr_failure(file, restricted_functions)
 
         function_usage = Linter._errors_list_from_linter_output(file, linter_output)
 
@@ -172,7 +176,7 @@ class Validator(Linter):
         if not Path(file_to_check).is_file():
             raise FileNotFoundError(file_to_check)
 
-        command = ['Rscript', 'error_linter.R', file_to_check]
+        command = ['Rscript', abspath('error_linter.R'), file_to_check]
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
     @staticmethod
@@ -191,7 +195,7 @@ class Validator(Linter):
         out = []
 
         file_text = Validator.__read_file(file)
-        libs_used = Validator.__get_used_libraries(file_text)
+        libs_used = Validator._get_used_libraries(file_text)
 
         for lib, i in libs_used:
             if lib in libraries:
@@ -255,10 +259,7 @@ class Validator(Linter):
         failures i.e. no restricted use then it gets another success item.
         """
 
-        # TODO: remove the comment and remove what come after
-        # linter_output = Linter._invoke_lintr_error(file)
-        with open("linter_output_errors.txt", "r") as f:
-            linter_output = f.read()
+        linter_output = Validator._invoke_lintr_error(file_to_validate)
 
         successes = []
 
@@ -312,11 +313,8 @@ class Validator(Linter):
             "passed": False
         }
 
-        # TODO: remove the reading file bit for invoke (_get_libraries)
-        # libraries = Validator._get_libraries()
-        with open("libraries.txt", "r") as f:
-            libraries = f.read()
-        libraries = libraries[5:-2]
+        libraries = Validator._get_libraries()
+        libraries = libraries[5:-3]
         libraries = libraries.split(",")
 
         for file in files:

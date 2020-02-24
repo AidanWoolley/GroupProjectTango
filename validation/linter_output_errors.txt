@@ -33,9 +33,3 @@ D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:8:6: warn
   if(txt == 'hi') 4
 
      ^~~
-
-D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:12:12: error: unexpected end of input
-
-{aa <- a + a
-
-           ^
