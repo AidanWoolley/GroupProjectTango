@@ -11,19 +11,32 @@ class Linter:
     """The class to perform static analysis of R code."""
 
     @staticmethod
-    def _score_file_by_errors(errors):
+    def _score_file_by_errors(errors, ignore_multiple):
         """
         Given a list of errors, returns score displayed to the user being in range [0,1].
 
-        Currently the default scoring formula of deducting 0.05 per error.
+        The default scoring formula of deducting 0.05 per error.
+        An enhancement is proposed in which ignore_multiple tells to ignore multiple occurrences of the same error -
+        if f.ex "Only use double-quotes." error appears twice it is calculated only once in the final score.
 
         Args:
             errors: list of errors returned by the linter
-
+            ignore_multiple (bool): whether to ignore multiple occurences of the same kind of error in calculating score
         Returns:
             Float: score of user's code
         """
-        return max(0, 1.0 - len(errors) * 0.05)
+        if not ignore_multiple:
+            return max(0, 1.0 - len(errors) * 0.05)
+
+        found_style_errors = set()
+        score = 1.0
+        for error in errors:
+            if error["type"] == 'style':
+                if not error["info"] in found_style_errors:
+                    score -= 0.05
+                    found_style_errors.add(error["info"])
+
+        return max(0, score)
 
     @staticmethod
     def _invoke_lintr(object_to_lint):
@@ -78,7 +91,7 @@ class Linter:
         return errors_list
 
     @staticmethod
-    def lint(object_to_lint):
+    def lint(object_to_lint, ignore_multiple_for_score=False):
         """
         The function to perform static analysis of R code.
 
@@ -121,7 +134,7 @@ class Linter:
             lint_output = Linter._invoke_lintr(object_to_lint[index])
             errors_list = Linter._errors_list_from_linter_output(object_to_lint[index], lint_output)
             out["runners"][index]["errors"] = errors_list
-            out["runners"][index]["score"] = Linter._score_file_by_errors(errors_list)
+            out["runners"][index]["score"] = Linter._score_file_by_errors(errors_list, ignore_multiple=ignore_multiple_for_score)
             out["runners"][index]["runner_key"] = "Hadley Wickham's R Style Guide"
 
         return json.dumps(out)
