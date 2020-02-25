@@ -127,12 +127,12 @@ def test_linter_correctly_ignores_multiple_similar_style_errors():
     dict_result = json.loads(lint_result)
     assert dict_result["runners"][0]["score"] == 0.95
 
-
-test_linter_raises_error_if_filenotfound()
-test_linter_handles_files_with_special_characters()
-test_linter_includes_compile_errors()
-test_linter_includes_warnings()
-test_linter_returns_score_0_when_many_errors()
-test_linter_on_perfect_code()
-test_linter_correctly_ignores_multiple_similar_style_errors()
-print("SUCCESS")
+# No need for these for CI, just run pytest
+# test_linter_raises_error_if_filenotfound()
+# test_linter_handles_files_with_special_characters()
+# test_linter_includes_compile_errors()
+# test_linter_includes_warnings()
+# test_linter_returns_score_0_when_many_errors()
+# test_linter_on_perfect_code()
+# test_linter_correctly_ignores_multiple_similar_style_errors()
+# print("SUCCESS")
