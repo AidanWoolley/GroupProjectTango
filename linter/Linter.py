@@ -61,6 +61,7 @@ class Linter:
             # It must be written to a file, /proc/self/fd/1 is stdout!
             f'library("lintr"); checkstyle_output(lint("{object_to_lint}"), "/proc/self/fd/1")'
         ]
+        # LANG=POSIX in env enforces only ascii characters
         return subprocess.run(command, stdout=subprocess.PIPE, env=dict(environ, LANG="POSIX")).stdout.decode("utf-8")
 
     @staticmethod
@@ -75,7 +76,7 @@ class Linter:
         try:
             linted_file = lintr_xml[0].attrib["name"]
         except IndexError:
-            return []  # No file child means no errors
+            return []  # No first child (which is node representing file) means no errors
 
         def create_err_dict(error):
             ret = {}
@@ -87,9 +88,6 @@ class Linter:
             return ret
 
         errors_list = [create_err_dict(error.attrib) for error in lintr_xml[0]]
-
-        # for error in errors_list:
-        #     error["info"] = error["info"].replace("\u2018", "'").replace("\u2019", "'")
 
         return errors_list
 
