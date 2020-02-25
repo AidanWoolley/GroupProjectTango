@@ -19,6 +19,7 @@ jobs:
         python -m pip install pyyaml pytest flake8 flake8-docstrings
     - name: Install R and R package dependencies
       run: |
+        sudo apt update
         sudo apt install -y r-base r-base-dev libxml2-dev libssl-dev libcurl4-openssl-dev
     - name: Load R packages from cache if possible
       uses: actions/cache@v1
