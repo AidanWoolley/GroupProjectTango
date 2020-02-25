@@ -9,7 +9,7 @@ import subprocess
 
 __author__ = "Anish_Das_ad945"
 
-PATH = os.getcwd()
+PATH = os.getcwd() + '/validation'
 
 
 class Validator():

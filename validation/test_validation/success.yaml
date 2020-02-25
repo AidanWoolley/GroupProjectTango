@@ -1,6 +1,6 @@
 files:
-  - test_validation/success.R
+  - validation/test_validation/success.R
 restricted_functions:
-  test_validation/success.R: []
+  validation/test_validation/success.R: []
 restricted_libraries:
-  test_validation/success.R: []
+  validation/test_validation/success.R: []
