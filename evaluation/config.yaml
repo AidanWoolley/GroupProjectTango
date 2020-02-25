@@ -4,3 +4,4 @@ tests:
   - testcases/test_calculate.R
   - testcases/test_decrement.R
   - testcases/test_increment.R
+  - testcases/test_addition.R
