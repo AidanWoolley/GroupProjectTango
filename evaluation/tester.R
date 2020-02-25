@@ -1,6 +1,8 @@
 require('rjson')
 require('yaml')
 
+source('find_functions.R')
+
 evaluator <- function(out_path) {
 	output_json <- list(
 		passed = TRUE
@@ -15,23 +17,28 @@ evaluator <- function(out_path) {
 	for (current_test_file in config_yaml[["tests"]]) {
 		source(current_test_file)
 
+		.tests <- find_functions(current_test_file)
+
 		for (current_test in .tests) {
-			test_result <- current_test()
+			test_result <- get(current_test)()
 			# success
 			if (test_result$status == 0) {
 				output_json$runners[[1]]$successes[[num_success]] <- test_result$data
+				output_json$runners[[1]]$successes[[num_success]]$test_name <- current_test
 				num_success = num_success + 1
 			}
 			# failure
 			else if (test_result$status == 1) {
 				output_json[["passed"]] = FALSE
 				output_json$runners[[1]]$failures[[num_fail]] <- test_result$data
+				output_json$runners[[1]]$failures[[num_fail]]$test_name <- current_test
 				num_fail = num_fail + 1
 			}
 			# error
 			else {
 				output_json[["passed"]] = FALSE
 				output_json$runners[[1]]$errors[[num_error]] <- test_result$data
+				output_json$runners[[1]]$errors[[num_error]]$test_name <- current_test
 				num_error = num_error + 1
 			}
 		}

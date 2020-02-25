@@ -10,5 +10,3 @@ testIncrement <- function() {
 
 	return(tdk_return())
 }
-
-.tests <- c(testIncrement)

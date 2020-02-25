@@ -1,5 +1,7 @@
 require('gtools')
 
+source('find_functions.R')
+
 # We use a macro instead of a function because we
 # want to capture environment of the calling
 # function.
@@ -41,13 +43,16 @@ tdk_return <- gtools::defmacro(x, y, expr = {
 		tdk_info <- ""
 	if (!exists("tdk_test_description"))
 		tdk_test_description <- ""
-	if (!exists("tdk_tested_name"))
+	if (!exists("tdk_tested_name")) {
 		tdk_tested_name <- ""
+		tdk_file_path <- ""
+	} else {
+		tdk_file_path <- attr(attr(get(tdk_tested_name), "srcref"), "srcfile")$filename
+	}
 
 	ret <- list(
-		test_name = "", # TODO: name of the tester function
 		test_description = tdk_test_description,
-		file_path = "", # TODO: path to tested function
+		file_path = tdk_file_path, # TODO: path to tested function
 		test_type = "primary",
 		function_tested__name = tdk_tested_name,
 		function_tested__description = "" # TODO: tested function description
@@ -99,13 +104,3 @@ tdk_run <- gtools::defmacro(fn, x, expr = {
 	tdk_details = "" # TODO: stacktrace
 	return(0)
 })
-
-testEquals <- function(passed_value, intended_value, function_tested, test_description="") {
-
-    pass <- TRUE
-    if (passed_value != intended_value) {
-        pass <- FALSE
-    }
-
-    return(list(passed = pass, function_tested = function_tested, test_description = test_description))
-}

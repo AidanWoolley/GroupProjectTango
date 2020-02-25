@@ -20,5 +20,3 @@ testDecrementOne <- function() {
 
 	return(tdk_return())
 }
-
-.tests = c(testDecrementZero, testDecrementOne)
