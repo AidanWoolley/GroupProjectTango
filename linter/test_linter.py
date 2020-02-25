@@ -31,13 +31,13 @@ def test_invoke_lintr():
         None
     """
     basic_warning_path = os.path.abspath("linter/testprograms/warning.R")
-    print(basic_warning_path)
     basic_warning_result = (
-        f"{basic_warning_path}:2:3: warning: local variable 'some_variable' assigned but "
-        "may not be used\n  some_variable <- one + 1\n  ^~~~~~~~~~~~~\n"
+        '<?xml version="1.0" encoding="UTF-8"?>\n<checkstyle version="lintr-2.0.1">\n  '
+        f'<file name="{basic_warning_path}">\n    '
+        '<error line="2" column="3" severity="warning" '
+        'message="local variable \'some_variable\' assigned but may not be used"/>\n  </file>\n</checkstyle>\n'
     )
     lintr_result = Linter._invoke_lintr("linter/testprograms/warning.R")
-    print(lintr_result)
     assert lintr_result == basic_warning_result
 
 
@@ -65,7 +65,7 @@ def test_linter_handles_files_with_special_characters():
     desired_result = {"runners": [{"errors": [{
         "file_path": PATH_TO_FILES + "!@# $%^&*(h ello: world.R",
         "line_number": "1",
-        "type": "style",
+        "type": "info",
         "info": "Only use double-quotes.",
         "column_number": "7"}], "score": 0.95, "runner_key": "Hadley Wickham's R Style Guide"}]}
 
