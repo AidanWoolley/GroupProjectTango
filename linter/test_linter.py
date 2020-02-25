@@ -33,7 +33,7 @@ def test_invoke_lintr():
     basic_warning_path = os.path.abspath("linter/testprograms/warning.R")
     print(basic_warning_path)
     basic_warning_result = (
-        f"{basic_warning_path}:2:3: warning: local variable ‘some_variable’ assigned but "
+        f"{basic_warning_path}:2:3: warning: local variable 'some_variable' assigned but "
         "may not be used\n  some_variable <- one + 1\n  ^~~~~~~~~~~~~\n"
     )
     lintr_result = Linter._invoke_lintr("linter/testprograms/warning.R")
