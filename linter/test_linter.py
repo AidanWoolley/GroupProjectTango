@@ -23,6 +23,20 @@ def _ordered(obj):
         return obj
 
 
+def test_invoke_lintr():
+    """
+    Checks that lintr works on invocation.
+
+    Returns:
+        None
+    """
+    basic_warning_result = (
+        f"{os.path.abspath('linter/testprograms/warning.R')}:2:3: warning: local variable ‘some_variable’ assigned but "
+        "may not be used\n  some_variable <- one + 1\n  ^~~~~~~~~~~~~\n"
+    )
+    assert Linter._invoke_lintr("linter/testprograms/warning.R") == basic_warning_result
+
+
 def test_linter_raises_error_if_filenotfound():
     """
     Checks that linter raises a proper error if file is not found.
@@ -126,13 +140,3 @@ def test_linter_correctly_ignores_multiple_similar_style_errors():
     lint_result = Linter.lint("linter/testprograms/zero.R", ignore_multiple_for_score=True)
     dict_result = json.loads(lint_result)
     assert dict_result["runners"][0]["score"] == 0.95
-
-# No need for these for CI, just run pytest
-# test_linter_raises_error_if_filenotfound()
-# test_linter_handles_files_with_special_characters()
-# test_linter_includes_compile_errors()
-# test_linter_includes_warnings()
-# test_linter_returns_score_0_when_many_errors()
-# test_linter_on_perfect_code()
-# test_linter_correctly_ignores_multiple_similar_style_errors()
-# print("SUCCESS")
