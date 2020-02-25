@@ -36,7 +36,9 @@ def test_invoke_lintr():
         f"{basic_warning_path}:2:3: warning: local variable ‘some_variable’ assigned but "
         "may not be used\n  some_variable <- one + 1\n  ^~~~~~~~~~~~~\n"
     )
-    assert Linter._invoke_lintr("linter/testprograms/warning.R") == basic_warning_result
+    lintr_result = Linter._invoke_lintr("linter/testprograms/warning.R")
+    print(lintr_result)
+    assert lintr_result == basic_warning_result
 
 
 def test_linter_raises_error_if_filenotfound():
