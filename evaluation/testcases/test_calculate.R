@@ -1,6 +1,14 @@
 source("src/calculate.R")
 source("test_tools.R")
 
+.descriptions <- list(
+	multiply = "multiplies by 30"
+)
+
+.helper <- function() {
+	return(0)
+}
+
 testMultiplyZero <- function() {
     tdk_test_description <- "testing multiplication by zero"
 	tdk_tested_name <- "multiply"

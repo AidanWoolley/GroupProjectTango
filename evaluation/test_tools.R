@@ -28,6 +28,15 @@ assert_equals <- gtools::defmacro(x, y, expr = {
 	}
 })
 
+assert_less_than <- gtools::defmacro(x, y, expr = {
+	if (!exists("tdk_status"))
+		tdk_status = 0
+	if (tdk_status != 2 && (x) >= (y)) {
+		tdk_info <- "unexpected result"
+		tdk_status <- 1
+	}
+})
+
 assert_same_type <- gtools::defmacro(x, y, expr = {
 	if (!exists("tdk_status"))
 		tdk_status <- 0
@@ -37,7 +46,6 @@ assert_same_type <- gtools::defmacro(x, y, expr = {
 	}
 })
 
-# TODO: check if all the variables are defined
 tdk_return <- gtools::defmacro(x, y, expr = {
 	if (!exists("tdk_info"))
 		tdk_info <- ""
@@ -52,10 +60,9 @@ tdk_return <- gtools::defmacro(x, y, expr = {
 
 	ret <- list(
 		test_description = tdk_test_description,
-		file_path = tdk_file_path, # TODO: path to tested function
+		file_path = tdk_file_path, 
 		test_type = "primary",
-		function_tested__name = tdk_tested_name,
-		function_tested__description = "" # TODO: tested function description
+		function_tested__name = tdk_tested_name
 	)
 
 	# Either a failure or an error

@@ -20,3 +20,10 @@ testDecrementOne <- function() {
 
 	return(tdk_return())
 }
+
+testDecrementUndocumented <- function() {
+	result <- tdk_run(decrement, 2)
+	assert_equals(result, 1)
+
+	return(tdk_return())
+}
