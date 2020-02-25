@@ -3,11 +3,13 @@ import yaml
 import re
 import json
 from os.path import abspath
+import os
 from pathlib import Path
-from linter.Linter import Linter
 import subprocess
 
 __author__ = "Anish_Das_ad945"
+
+PATH = os.getcwd()
 
 
 class Validator():
@@ -33,13 +35,44 @@ class Validator():
         return config
 
     @staticmethod
+    def _errors_list_from_linter_output(linted_file, linter_output):
+        """
+        Parses the multiline string `linter_output` and returns a list of errors.
+
+        Returns:
+            A list of dictionaries detailing errors in a format suitable for the EDUKATE platform
+        """
+        linted_file = abspath(linted_file)
+        err_line_regex = (
+            rf"^(?P<path>{re.escape(linted_file)}):"
+            r"(?P<line>\d+):"
+            r"(?P<col>\d+): "
+            r"(?P<type>style|warning|error): "
+            r"(?P<msg>.*)$"
+        )
+
+        def create_err_dict(line_match):
+            ret = {}
+            ret["file_path"] = line_match.group('path')
+            ret["line_number"] = line_match.group('line')
+            ret["type"] = line_match.group('type')
+            ret["info"] = line_match.group('msg')
+            ret["column_number"] = line_match.group('col')
+            return ret
+
+        parsed_lines = re.finditer(err_line_regex, linter_output, re.M)
+        errors_list = [create_err_dict(line) for line in parsed_lines]
+
+        return errors_list
+
+    @staticmethod
     def _get_libraries():
         """
         Runs an R script to return all the installed.packages() on the machine.
 
         :return: a list of all the available libraries that the user can use.
         """
-        command = ["Rscript", abspath("get_libraries.R")]
+        command = ["Rscript", PATH + "/get_libraries.R"]
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode('utf-8')
 
     @staticmethod
@@ -66,7 +99,7 @@ class Validator():
         if not Path(file_to_check).is_file():
             raise FileNotFoundError(file_to_check)
 
-        command = ['Rscript', abspath('failure_linter.R'), file_to_check, *restricted_functions]
+        command = ['Rscript', PATH + '/failure_linter.R', file_to_check, *restricted_functions]
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode('utf-8')
 
     @staticmethod
@@ -146,7 +179,7 @@ class Validator():
 
         linter_output = Validator._invoke_lintr_failure(file, restricted_functions)
 
-        function_usage = Linter._errors_list_from_linter_output(file, linter_output)
+        function_usage = Validator._errors_list_from_linter_output(file, linter_output)
 
         for fail in function_usage:
             func_match = re.match(r"Function \"(?P<func>.+)\" is undesirable\.",
@@ -176,7 +209,7 @@ class Validator():
         if not Path(file_to_check).is_file():
             raise FileNotFoundError(file_to_check)
 
-        command = ['Rscript', abspath('error_linter.R'), file_to_check]
+        command = ['Rscript', PATH + '/error_linter.R', file_to_check]
         return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
     @staticmethod
@@ -263,7 +296,7 @@ class Validator():
 
         successes = []
 
-        errors_list = Linter._errors_list_from_linter_output(file_to_validate, linter_output)
+        errors_list = Validator._errors_list_from_linter_output(file_to_validate, linter_output)
         errors = Validator._check_errors(file_to_validate, errors_list, libraries)
 
         if len(errors) == 0:
@@ -331,3 +364,12 @@ class Validator():
             out["passed"] = True
 
         return json.dumps(out, indent=2)
+
+
+if __name__ == "__main__":
+    print(
+        json.dumps(
+            Validator.validate_file("test_validation/syntax_error.R", [], [], []),
+            indent=2
+        )
+    )
