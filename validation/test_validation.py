@@ -1,9 +1,8 @@
-import unittest
+"""Tests for Validation.py."""
 import json
 from os.path import abspath
 from pathlib import Path
 from Validation import Validator
-import pytest
 
 PATH = "validation/test_validation/"
 
@@ -11,6 +10,7 @@ PATH = "validation/test_validation/"
 def __read_file(file):
     """
     Checks whether file exists and if it does sends the text out.
+
     :param file: the relative path to the file
 
     :return: returs the text of a file that exists
@@ -41,9 +41,7 @@ def list_equal(list1, list2):
 
 
 def test_exceptions():
-    """
-    Tests if the code properly throws exceptions when a file doesn't exist or not.
-    """
+    """Tests if the code properly throws exceptions when a file doesn't exist or not."""
     try:
         Validator._read_config('not_config.yaml')
         assert False
@@ -58,9 +56,7 @@ def test_exceptions():
 
 
 def test_read_config():
-    """
-    Tests to see if the config file is read properly.
-    """
+    """Tests to see if the config file is read properly."""
     config_yaml = PATH + 'config.yaml'
     config = Validator._read_config(config_yaml)
 
@@ -79,10 +75,7 @@ def test_read_config():
 
 
 def test_get_used_libraries():
-    """
-    Test for see if the list of used library, line_number tuples returned form the code
-    match the expected values.
-    """
+    """Test for see if the list of used library, line_number tuples returned form the code match the expected values."""
     known_libraries_output = Validator._get_used_libraries(
         __read_file(PATH + 'known_libraries.R'))
     restricted_functions_output = Validator._get_used_libraries(
@@ -143,9 +136,7 @@ def test_get_used_libraries():
 
 
 def test_failure_with_restricted_functions():
-    """
-    Test to see if failures by using restricted functions is caught.
-    """
+    """Test to see if failures by using restricted functions is caught."""
     output = Validator.validate_file(PATH + 'restricted_functions.R',
                                      [], [], ['print'])
     assert len(output) == 3
@@ -166,9 +157,7 @@ def test_failure_with_restricted_functions():
 
 
 def test_failures_with_restricted_libraries():
-    """
-    Test to see if failures due to use of restricted libraries is caught.
-    """
+    """Test to see if failures due to use of restricted libraries is caught."""
     output = Validator.validate_file(PATH + 'restricted_libraries.R',
                                      ['restricted_library'],
                                      ['restricted_library'],
@@ -193,9 +182,7 @@ def test_failures_with_restricted_libraries():
 
 
 def test_errors_with_syntax_error():
-    """
-    Test to see if syntax errors are caught.
-    """
+    """Test to see if syntax errors are caught."""
     output = Validator.validate_file(PATH + 'syntax_error.R',
                                      [],
                                      [],
@@ -228,9 +215,7 @@ def test_errors_with_syntax_error():
 
 
 def test_errors_with_unknown_libraries():
-    """
-    Test to see if use of unkown libraries is caught.
-    """
+    """Test to see if use of unkown libraries is caught."""
     output = Validator.validate_file(PATH + 'unknown_libraries.R',
                                      [],
                                      [],
@@ -258,9 +243,7 @@ def test_errors_with_unknown_libraries():
 
 
 def test_success():
-    """
-    Test to see if proper code passes the validator.
-    """
+    """Test to see if proper code passes the validator."""
     output = json.loads(Validator.validate(PATH + 'success.yaml'))
     list_equal(list(output.keys()), ['runners', 'passed'])
     assert output['passed']
