@@ -91,19 +91,20 @@ tdk_return <- gtools::defmacro(x, y, expr = {
 #     )
 # always returns 2
 
-tdk_run <- gtools::defmacro(fn, x, expr = {
+tdk_run <-gtools::defmacro(fn, DOTS, expr = {
 	tdk_fn_executed <- FALSE
 
 	result <- tryCatch({
-			tdk_result <- fn(x)
+			tdk_result <- fn(...)
 			tdk_fn_executed = TRUE
 			# If we return here, we would go to error (?)
-			result
+			tdk_result
 		},
 		error = gtools::defmacro(e, expr = {
 			return(0)
 		})
 	)
+
 	if (tdk_fn_executed)
 		return(result)
 	tdk_status = 2
