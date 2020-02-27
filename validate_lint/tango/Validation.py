@@ -195,6 +195,7 @@ class Validator(Linter):
 
         errors_list = Validator._parse_lintr_output(Validator._invoke_error_lintr(file_to_check))
         for error in errors_list:
+            print(error)
             # unused variables have level `warning` but we consider them style errors and ignore them here
             if re.match(r"local variable \'.*?\' assigned but may not be used", error["info"]):
                 continue
