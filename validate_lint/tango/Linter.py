@@ -136,6 +136,8 @@ class Linter:
             ret["column_number"] = error["column"]
             return ret
 
+        for error in lintr_xml[0]:
+            print(error.attrib)
         errors_list = [create_err_dict(error.attrib) for error in lintr_xml[0]]
 
         return errors_list
