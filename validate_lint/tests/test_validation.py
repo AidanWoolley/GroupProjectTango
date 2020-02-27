@@ -233,6 +233,7 @@ def test_errors_with_syntax_error():
     assert len(output) == 3
     success, failures, errors = output
 
+    print(success, failures, errors)
     assert len(success) == 2
     assert len(failures) == 0
     assert len(errors) == 3
