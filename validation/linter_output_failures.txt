@@ -1,5 +1,0 @@
-D:\Desktop\Part1B\GroupProject\Tango\validation\example_linter_input.R:8:3: warning: Function "print" is undesirable. As an alternative, restricted function.
-
-  print(four)
-
-  ^~~~~

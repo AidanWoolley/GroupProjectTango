@@ -1,6 +1,0 @@
-files:
-  - validation/test_validation/success.R
-restricted_functions:
-  validation/test_validation/success.R: []
-restricted_libraries:
-  validation/test_validation/success.R: []

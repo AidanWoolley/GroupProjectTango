@@ -1,0 +1,6 @@
+files:
+  - success.R
+restricted_functions:
+  success.R: []
+restricted_libraries:
+  success.R: []
