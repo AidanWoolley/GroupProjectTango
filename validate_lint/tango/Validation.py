@@ -193,6 +193,7 @@ class Validator(Linter):
 
                 out.append(temp)
         linter_output = Validator._invoke_error_lintr(file_to_check)
+        print("linter_output: \n" + linter_output)
         errors_list = Validator._parse_lintr_output(linter_output)
         for error in errors_list:
             # unused variables have level `warning` but we consider them style errors and ignore them here
