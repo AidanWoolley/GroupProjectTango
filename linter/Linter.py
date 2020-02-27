@@ -104,4 +104,5 @@ class Linter:
 
 
 if __name__ == '__main__':
-    print(Linter.lint("example_linter_input.R"))
+    with open("/home/tango/out/l_out.json", "w") as f:
+        f.write(Linter.lint("example_linter_input.R"))
