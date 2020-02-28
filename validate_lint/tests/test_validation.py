@@ -6,7 +6,7 @@ from os.path import abspath, dirname, join as joinpath
 import yaml
 
 from pytest import raises as assert_raises
-from ..tango.Validation import Validator
+from ..tango.validation import Validator
 
 PATH_TO_TEST_RES = joinpath(dirname(__file__), "validation_test_res")
 

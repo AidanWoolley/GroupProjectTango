@@ -7,7 +7,7 @@ import yaml
 
 from pytest import raises as assert_raises
 
-from ..tango.Linter import Linter
+from ..tango.linter import Linter
 
 PATH_TO_TEST_RES = os.path.join(os.path.dirname(__file__), "linter_test_res")
 
