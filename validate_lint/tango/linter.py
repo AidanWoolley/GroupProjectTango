@@ -83,9 +83,11 @@ class Linter:
         Returns:
             (str): The output of the command decoded with utf-8.
         """
-        command = ["Rscript", "-e", r_cmd]
-        # LANG=POSIX in env enforces only ascii characters
-        return subprocess.run(command, stdout=subprocess.PIPE, env=dict(environ, LANG="POSIX")).stdout.decode("utf-8")
+        return subprocess.run(
+            ["Rscript", "-e", r_cmd],
+            stdout=subprocess.PIPE,
+            encoding="utf-8"
+        ).stdout.replace('‘', '\'').replace('’', '\'')  # Replace fixes non-ascii quotes
 
     @staticmethod
     def _invoke_lintr(file_to_lint, lint_options=None):
