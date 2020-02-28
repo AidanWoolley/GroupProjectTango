@@ -1,10 +1,11 @@
 """Unit tests for Linter.py."""
-import json
 import os
 
 from contextlib import contextmanager
 
 import yaml
+
+from pytest import raises as assert_raises
 
 from ..tango.Linter import Linter
 
@@ -81,11 +82,8 @@ def test_linter_raises_error_if_filenotfound():
     Returns:
         None
     """
-    try:
+    with assert_raises(FileNotFoundError):
         Linter.lint(_test_file("notfound.R"))
-        assert False
-    except FileNotFoundError:
-        assert True
 
 
 def test_linter_handles_files_with_special_characters():
@@ -95,14 +93,21 @@ def test_linter_handles_files_with_special_characters():
     Returns:
         None
     """
-    desired_result = {"runners": [{"errors": [{
-        "file_path": _test_file("!@# $%^&*(h ello: world.R"),
-        "line_number": "1",
-        "type": "info",
-        "info": "Only use double-quotes.",
-        "column_number": "7"}], "score": 0.95, "runner_key": "Hadley Wickham's R Style Guide"}]}
+    desired_result = {
+        "runners": [{
+            "errors": [{
+                "file_path": _test_file("!@# $%^&*(h ello: world.R"),
+                "line_number": 1,
+                "type": "info",
+                "info": "Only use double-quotes.",
+                "column_number": 7
+            }],
+            "score": 0.95,
+            "runner_key": "Hadley Wickham's R Style Guide"
+        }]
+    }
     with _create_test_yaml("!@# $%^&*(h ello: world") as f:
-        lint_result = json.loads(Linter.lint(f))
+        lint_result = Linter.lint(f)
     assert _ordered(lint_result) == _ordered(desired_result)
 
 
@@ -113,14 +118,21 @@ def test_linter_includes_compile_errors():
     Returns:
         None
     """
-    desired_result = {"runners": [{"errors": [{
-        "file_path": _test_file("compilation_error.R"),
-        "line_number": "1",
-        "type": "error",
-        "info": "unexpected end of input",
-        "column_number": "20"}], "score": 0.95, "runner_key": "Hadley Wickham's R Style Guide"}]}
+    desired_result = {
+        "runners": [{
+            "errors": [{
+                "file_path": _test_file("compilation_error.R"),
+                "line_number": 1,
+                "type": "error",
+                "info": "unexpected end of input",
+                "column_number": 20
+            }],
+            "score": 0.95,
+            "runner_key": "Hadley Wickham's R Style Guide"
+        }]
+    }
     with _create_test_yaml("compilation_error") as f:
-        lint_result = json.loads(Linter.lint(f))
+        lint_result = Linter.lint(f)
     assert _ordered(lint_result) == _ordered(desired_result)
 
 
@@ -131,14 +143,21 @@ def test_linter_includes_warnings():
     Returns:
         None
     """
-    desired_result = {"runners": [{"errors": [{
-        "file_path": _test_file("warning.R"),
-        "line_number": "2",
-        "type": "warning",
-        "info": "local variable 'some_variable' assigned but may not be used",
-        "column_number": "3"}], "score": 0.95, "runner_key": "Hadley Wickham's R Style Guide"}]}
+    desired_result = {
+        "runners": [{
+            "errors": [{
+                "file_path": _test_file("warning.R"),
+                "line_number": 2,
+                "type": "warning",
+                "info": "local variable 'some_variable' assigned but may not be used",
+                "column_number": 3
+            }],
+            "score": 0.95,
+            "runner_key": "Hadley Wickham's R Style Guide"
+        }]
+    }
     with _create_test_yaml("warning") as f:
-        lint_result = json.loads(Linter.lint(f))
+        lint_result = Linter.lint(f)
     assert _ordered(lint_result) == _ordered(desired_result)
 
 
@@ -151,8 +170,7 @@ def test_linter_returns_score_0_when_many_errors():
     """
     with _create_test_yaml("zero") as f:
         lint_result = Linter.lint(f)
-    dict_result = json.loads(lint_result)
-    assert dict_result["runners"][0]["score"] == 0
+    assert lint_result["runners"][0]["score"] == 0
 
 
 def test_linter_on_perfect_code():
@@ -162,9 +180,15 @@ def test_linter_on_perfect_code():
     Returns:
         None
     """
-    desired_result = ({"runners": [{"errors": [], "score": 1, "runner_key": "Hadley Wickham's R Style Guide"}]})
+    desired_result = {
+        "runners": [{
+            "errors": [],
+            "score": 1,
+            "runner_key": "Hadley Wickham's R Style Guide"
+        }]
+    }
     with _create_test_yaml("perfect") as f:
-        lint_result = json.loads(Linter.lint(f))
+        lint_result = Linter.lint(f)
     assert _ordered(lint_result) == _ordered(desired_result)
 
 
@@ -177,5 +201,4 @@ def test_linter_correctly_ignores_multiple_similar_style_errors():
     """
     with _create_test_yaml("zero") as f:
         lint_result = Linter.lint(f, ignore_multiple_for_score=True)
-    dict_result = json.loads(lint_result)
-    assert dict_result["runners"][0]["score"] == 0.95
+    assert lint_result["runners"][0]["score"] == 0.95

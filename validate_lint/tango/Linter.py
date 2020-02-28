@@ -1,5 +1,4 @@
 """The class to perform static analysis of R code."""
-import json
 import subprocess
 import xml.etree.ElementTree as xmlTree
 
@@ -130,10 +129,10 @@ class Linter:
         def create_err_dict(error):
             ret = {}
             ret["file_path"] = linted_file
-            ret["line_number"] = error["line"]
+            ret["line_number"] = int(error["line"])
             ret["type"] = error["severity"]
             ret["info"] = error["message"]
-            ret["column_number"] = error["column"]
+            ret["column_number"] = int(error["column"])
             return ret
 
         errors_list = [create_err_dict(error.attrib) for error in lintr_xml[0]]
@@ -188,4 +187,4 @@ class Linter:
         out["runners"][0]["errors"] = errors_list
         out["runners"][0]["score"] = score
         out["runners"][0]["runner_key"] = "Hadley Wickham's R Style Guide"
-        return json.dumps(out)
+        return out

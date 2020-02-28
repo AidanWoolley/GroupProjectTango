@@ -1,5 +1,4 @@
 """This class takes the static analysis from produces output in relevant format."""
-import json
 import os
 import re
 
@@ -199,12 +198,27 @@ class Validator(Linter):
             if re.match(r"local variable \'.*?\' assigned but may not be used", error["info"]):
                 continue
 
-            temp = {
-                "type": "syntax",
-                "info": error["info"],
-                "file_path": file_to_check,
-                "line_number": error["line_number"]
-            }
+            if error['info'].startswith('no visible binding for global variable'):
+                temp = {
+                    'type': 'unknown variable',
+                    'info': error['info'],
+                    'file_path': file_to_check,
+                    'line_number': error['line_number']
+                }
+            elif error['info'].startswith('no visible global function definition for'):
+                temp = {
+                    'type': 'unknown function',
+                    'info': error['info'],
+                    'file_path': file_to_check,
+                    'line_number': error['line_number']
+                }
+            else:
+                temp = {
+                    'type': 'syntax',
+                    'info': error['info'],
+                    'file_path': file_to_check,
+                    'line_number': error['line_number']
+                }
 
             out.append(temp)
 
@@ -293,4 +307,4 @@ class Validator(Linter):
         if (len(out["runners"][0]["errors"]) == 0 and len(out["runners"][0]["failures"]) == 0):
             out["passed"] = True
 
-        return json.dumps(out, indent=2)
+        return out
