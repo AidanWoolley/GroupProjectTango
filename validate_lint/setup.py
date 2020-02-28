@@ -1,3 +1,4 @@
+"""Setup.py file for tango module, which provides Linter and Validator."""
 import setuptools
 
 setuptools.setup(
