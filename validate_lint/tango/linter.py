@@ -2,7 +2,6 @@
 import subprocess
 import xml.etree.ElementTree as xmlTree
 
-from os import environ
 from os.path import isfile, join as joinpath, dirname as dirname
 
 import yaml
