@@ -1,4 +1,5 @@
 require('gtools')
+require('R.utils')
 
 source('find_functions.R')
 
@@ -22,7 +23,15 @@ source('find_functions.R')
 assert_equals <- gtools::defmacro(x, y, expr = {
 	if (!exists("tdk_status"))
 		tdk_status = 0
-	if (tdk_status != 2 && (x) != (y)) {
+	if (is.null(x) && !is.null(y)) {
+		tdk_info <- "unexpected result (got null)"
+		tdk_status <- 1
+	}
+	else if (!is.null(x) && is.null(y)) {
+		tdk_info <- "unexpected result (didn't get null)"
+		tdk_status <- 1
+	}
+	else if (tdk_status != 2 && (x) != (y)) {
 		tdk_info <- "unexpected result"
 		tdk_status <- 1
 	}
@@ -49,6 +58,8 @@ assert_same_type <- gtools::defmacro(x, y, expr = {
 tdk_return <- gtools::defmacro(x, y, expr = {
 	if (!exists("tdk_info"))
 		tdk_info <- ""
+	if (!exists("tdk_details"))
+		tdk_details <- ""
 	if (!exists("tdk_test_description"))
 		tdk_test_description <- ""
 	if (!exists("tdk_tested_name")) {
@@ -60,7 +71,7 @@ tdk_return <- gtools::defmacro(x, y, expr = {
 
 	ret <- list(
 		test_description = tdk_test_description,
-		file_path = tdk_file_path, 
+		file_path = tdk_file_path,
 		test_type = "primary",
 		function_tested__name = tdk_tested_name
 	)
@@ -68,7 +79,7 @@ tdk_return <- gtools::defmacro(x, y, expr = {
 	# Either a failure or an error
 	if (tdk_status != 0) {
 		ret[["info"]] <- tdk_info
-		ret[["details"]] <- "" # TODO: stacktrace
+		ret[["details"]] <- tdk_details
 	}
 
 	# This is a macro, so return is omitted
@@ -77,7 +88,6 @@ tdk_return <- gtools::defmacro(x, y, expr = {
 
 # Runs the function fn with arguments <for now only x>
 # and captures its errors into environmental tdk_ variables
-# TODO: take variable number of arguments
 # TODO: this is a horrible implementation
 # For some reason
 #     tryCatch({
@@ -90,25 +100,26 @@ tdk_return <- gtools::defmacro(x, y, expr = {
 #       }
 #     )
 # always returns 2
-
-tdk_run <-gtools::defmacro(fn, DOTS, expr = {
+tdk_run <- gtools::defmacro(fn, DOTS, expr = {
 	tdk_fn_executed <- FALSE
 
 	result <- tryCatch({
-			tdk_result <- fn(...)
+			# TODO: replace silent with something nicer
+			tdk_result <- withTimeout(fn(...), timeout = 1.5, onTimeout = "silent")
 			tdk_fn_executed = TRUE
 			# If we return here, we would go to error (?)
-			tdk_result
+			list(calculation = tdk_result, details = "", info = "")
 		},
 		error = gtools::defmacro(e, expr = {
+			return(list(calculation = 0, details = paste(unlist(capture.output(traceback(e))), collapse = '\n'), info = typeof(e)))
 			return(0)
 		})
 	)
 
 	if (tdk_fn_executed)
-		return(result)
+		return(result$calculation)
 	tdk_status = 2
-	tdk_info = "" # TODO: print e
-	tdk_details = "" # TODO: stacktrace
+	tdk_info = result$info
+	tdk_details = result$details
 	return(0)
 })

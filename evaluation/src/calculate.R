@@ -9,3 +9,8 @@ decrement <- function(start) {
 increment <- function(start) {
 	stop("No!")
 }
+
+increment2 <- function(start) {
+	while (TRUE) {  }
+	return(start + 2)
+}
