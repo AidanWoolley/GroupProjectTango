@@ -1,0 +1,21 @@
+files:
+- file1.R
+- file2.R
+restricted_functions:
+  file1.R:
+  - func1
+  - func2
+  - func3
+  file2.R:
+  - func0
+  - func1
+  - func2
+restricted_libraries:
+  file1.R:
+  - lib1
+  - lib2
+  - lib3
+  file2.R:
+  - lib4
+  - lib5
+  - lib6
