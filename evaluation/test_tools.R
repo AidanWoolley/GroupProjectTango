@@ -100,7 +100,7 @@ tdk_return <- gtools::defmacro(x, y, expr = {
 #       }
 #     )
 # always returns 2
-tdk_run <- gtools::defmacro(fn, timeout = 1.0, DOTS, expr = {
+tdk_run <- gtools::defmacro(fn, DOTS, timeout = 1.0, expr = {
 	tdk_fn_executed <- FALSE
 
 	result <- tryCatch({
