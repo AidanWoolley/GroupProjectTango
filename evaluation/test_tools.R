@@ -100,12 +100,12 @@ tdk_return <- gtools::defmacro(x, y, expr = {
 #       }
 #     )
 # always returns 2
-tdk_run <- gtools::defmacro(fn, DOTS, expr = {
+tdk_run <- gtools::defmacro(fn, timeout = 1.0, DOTS, expr = {
 	tdk_fn_executed <- FALSE
 
 	result <- tryCatch({
 			# TODO: replace silent with something nicer
-			tdk_result <- withTimeout(fn(...), timeout = 1.5, onTimeout = "silent")
+			tdk_result <- withTimeout(fn(...), timeout = timeout, onTimeout = "silent")
 			tdk_fn_executed = TRUE
 			# If we return here, we would go to error (?)
 			list(calculation = tdk_result, details = "", info = "")
