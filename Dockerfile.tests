@@ -26,7 +26,7 @@ RUN apt update && \
         libcurl4-openssl-dev \
         libssl-dev && \
     python3 -m pip install pyyaml pytest flake8 flake8-docstrings
-
+COPY --from=r_package_builder /usr/local/lib/R /usr/local/lib/R
 ENTRYPOINT [ "/bin/bash" ]
 
 # docker-slim shrinks to about 165MB
