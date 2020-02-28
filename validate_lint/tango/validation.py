@@ -5,7 +5,7 @@ import re
 from os.path import isfile, abspath, join as joinpath, dirname
 from string import whitespace
 
-from .Linter import Linter
+from .linter import Linter
 
 __author__ = "Anish_Das_ad945"
 

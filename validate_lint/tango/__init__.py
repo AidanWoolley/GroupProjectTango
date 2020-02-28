@@ -1,3 +1,3 @@
 """__init__.py file for tango package."""
-from .Linter import Linter          # noqa
-from .Validation import Validator   # noqa
+from .linter import Linter          # noqa
+from .validation import Validator   # noqa
