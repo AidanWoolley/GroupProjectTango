@@ -23,7 +23,7 @@ jobs:
         sudo apt install -y r-base r-base-dev libxml2-dev libssl-dev libcurl4-openssl-dev
     - name: Install required R packages
       run: |
-        sudo Rscript -e "install.packages(c('lintr', 'rjson', 'gtools', 'yaml'))"
+        sudo Rscript -e "install.packages(c('lintr', 'rjson', 'gtools', 'yaml', 'stringi'))"
     - name: Test with pytest
       run: |
         pytest -v
