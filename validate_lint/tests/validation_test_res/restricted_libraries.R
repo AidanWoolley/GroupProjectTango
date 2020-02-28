@@ -1,0 +1,5 @@
+library("rjson")
+library(  'rjson')
+require("rjson")
+library(logical.return=TRUE, package = other_lib)
+require("extra_lib", logical.return=TRUE)
