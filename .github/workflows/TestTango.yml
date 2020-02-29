@@ -1,29 +1,20 @@
-name: Python application
+name: test All Tango Code
 
 on: [push]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
+    container: awoolley10/tango-test:latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
+    - name: Checkout the repository
+      uses: actions/checkout@v2
     - name: Lint with flake8
       run: |
-        pip install flake8 flake8-docstrings
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # Line length chosen as reasonable project default
         flake8 . --count --docstring-convention google --max-complexity=10 --max-line-length=120 --statistics --ignore=D101,D212
     - name: Test with pytest
       run: |
-        pip install pytest
         pytest -v
