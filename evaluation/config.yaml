@@ -1,0 +1,8 @@
+files:
+  - src/calculate.R
+tests:
+  - testcases/test_increment2.R
+  - testcases/test_calculate.R
+  - testcases/test_decrement.R
+  - testcases/test_increment.R
+  - testcases/test_addition.R
