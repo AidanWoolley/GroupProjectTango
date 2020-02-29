@@ -2,8 +2,7 @@
 # Need 19.10 to get R 3.6, can't make R backports repo work...
 FROM ubuntu:19.10 as r_package_builder
 RUN apt update && \
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y \
+    DEBIAN_FRONTEND=noninteractive apt install -y \
         r-base \
         libxml2-dev\
         libcurl4-openssl-dev \
@@ -12,12 +11,11 @@ RUN Rscript --version
 RUN Rscript -e "install.packages(c('lintr', 'rjson', 'gtools', 'yaml'))"
 
 
-# The base final image without the build dependancies
+# The base final image without the R build dependancies
 FROM ubuntu:19.10
 COPY ./validate_lint/ /tmp/tango
 RUN apt update && \
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends --no-install-suggests \
+    DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends --no-install-suggests \
         r-base \
         python3 \
         python3-pip \
@@ -31,8 +29,6 @@ RUN apt update && \
     mkdir -p /home/tango/
 COPY --from=r_package_builder /usr/local/lib/R /usr/local/lib/R
 COPY ./evaluation/*.R /home/tango/
-COPY ./evaluation/config.yaml /home/tango/config.yaml
-COPY ./evaluation/testcases/* /home/tango/testcases/
 COPY ./run_tests.py /home/tango/run_tests.py
 WORKDIR /home/tango
 
