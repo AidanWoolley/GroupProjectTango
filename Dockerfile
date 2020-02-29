@@ -7,8 +7,7 @@ RUN apt update && \
         libxml2-dev\
         libcurl4-openssl-dev \
         libssl-dev
-RUN Rscript --version
-RUN Rscript -e "install.packages(c('lintr', 'rjson', 'gtools', 'yaml'))"
+RUN Rscript -e "install.packages(c('lintr', 'rjson', 'gtools', 'yaml', 'R.utils'))"
 
 
 # The base final image without the R build dependancies
