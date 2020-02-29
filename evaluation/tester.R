@@ -88,4 +88,4 @@ evaluator <- function(out_path) {
 	close(fd)
 }
 
-evaluator("output/evaluation_result.json")
+evaluator("out/evaluation.json")
