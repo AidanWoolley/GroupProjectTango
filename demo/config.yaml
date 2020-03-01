@@ -1,0 +1,21 @@
+files:
+    - src/demo.R
+tests:
+- testcases/demo.R
+restricted_functions:
+  src/demo.R:
+    - source
+    - sys.source
+    - Sys.getenv
+    - Sys.getpid
+    - Sys.sleep
+    - Sys.glob
+    - Sys.info
+    - Sys.which
+    - Sys.setenv
+    - withAutoprint
+    - eval
+restricted_libraries:
+  src/demo.R:
+    - lintr
+    - rjson

@@ -31,7 +31,5 @@ COPY ./evaluation/*.R /home/tango/
 COPY ./run_tests.py /home/tango/run_tests.py
 WORKDIR /home/tango
 
-ENTRYPOINT ["python3", "/home/tango/run_tests.py", "/home/tango/config.yaml"]
-
 # docker-slim shrinks to about 165MB
 # docker-slim build --http-probe=false --mount "/tmp/tango:/home/tango/out" --include-path=/tmp --include-path=/usr/lib/R --include-path=/usr/local/lib/R tango

@@ -1,0 +1,9 @@
+FROM ubuntu:19.10
+
+RUN apt update && apt install -y python3.7 python3-pip python3-setuptools docker.io
+RUN python3 -m pip install flask
+
+COPY ./demo/ /demo/
+WORKDIR /demo
+ENV FLASK_APP=demo
+ENTRYPOINT ["python3", "demo.py"]
