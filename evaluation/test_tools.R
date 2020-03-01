@@ -62,16 +62,14 @@ tdk_return <- gtools::defmacro(x, y, expr = {
 		tdk_details <- ""
 	if (!exists("tdk_test_description"))
 		tdk_test_description <- ""
-	if (!exists("tdk_tested_name")) {
+	if (!exists("tdk_tested_name"))
 		tdk_tested_name <- ""
+	if (!exists("tdk_file_path")) 
 		tdk_file_path <- ""
-	} else {
-		tdk_file_path <- attr(attr(get(tdk_tested_name), "srcref"), "srcfile")$filename
-	}
 
 	ret <- list(
 		test_description = tdk_test_description,
-		file_path = tdk_file_path, 
+		file_path = tdk_file_path,
 		test_type = "primary",
 		function_tested__name = tdk_tested_name
 	)

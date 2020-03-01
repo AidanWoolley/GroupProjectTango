@@ -1,5 +1,7 @@
-source("src/calculate.R")
 source("test_tools.R")
+
+tdk_file_path <- "src/calculate.R"
+source(tdk_file_path)
 
 testIncrement <- function() {
 	tdk_tested_name <- "increment"
