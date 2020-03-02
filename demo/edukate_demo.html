@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Group Project Tango Demo">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="./static/demo.css">
+    <link rel="stylesheet" href="./static/codemirror.css">
+    <link rel="stylesheet" href="./static/ayu-dark.css">
+    <title>Tango Demo: Automatic Assessor for R Code</title>
+</head>
+<body style="background-color: #0a0e14;">
+    <header>
+    </header>
+    <main>
+        <form id=editor>
+            <div id=code>
+                <h2 style="color: white;">Code</h2>
+                <textarea id="code-ide"></textarea>
+            </div>
+            <div style="margin-top: 40px;"></div>
+            <div id=tests>
+                <h2 style="color: white;">Tests</h2>
+                <textarea id="test-ide"></textarea>
+            </div>
+            <div style="display: flex; max-width: 45vw;">
+                <button type="button" onclick="testCode();" class="btn btn-primary" style="flex-basis: 0; flex-grow: 1;">Submit</button>
+                <button type="button" onclick="resetCode();" class="btn btn-danger" style="flex-basis: 0; flex-grow:  1;">Reset code</button>
+
+            </div>
+        </form>
+        <div id="feedback">
+            <h1 class="text-white">Press submit to assess your code</h1>
+        </div>
+    </main>
+    <footer>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="./static/codemirror.js"></script>
+    <script src="./static/r.js"></script>
+    <script>
+        const defaultCode = "fibonacci <- function (n) {\n" +
+                            "    if (!(n %% 1 == 0) || n < 0) {\n" +
+                            "        return(-1)\n" +
+                            "    }\n" +
+                            "    if (n == 0) {\n" +
+                            "        return(0)\n" +
+                            "    }\n" +
+                            "    if (n == 1) {\n" +
+                            "        return(1)\n" +
+                            "    }\n" +
+                            "    f2 <- 0\n" +
+                            "    f1 <- 1\n" +
+                            "    f0 <- 1\n" +
+                            "    for (i in 1:(n-1)) {\n" +
+                            "        f0 <- f1 + f2\n" +
+                            "        f2 <- f1\n" +
+                            "        f1 <- f0\n" +
+                            "    }\n" +
+                            "    return(f0)\n" +
+                            "}\n"
+        
+        const defaultTest = "source('test_tools.R')\n" +
+                            "tdk_file_path <- 'src/demo.R'\n" +
+                            "source(tdk_file_path)\n" +
+                            "testNonPositiveIntegerCauseError <- function() {\n" +
+                            "    tdk_tested_name <- 'fibonacci'\n" +
+                            "    tdk_test_description <- 'Check function returns error code -1 for non-positive-integer arguments'\n" +
+                            "\n" +
+                            "    result <- tdk_run(fibonacci, 0.5)\n" +
+                            "    assert_equals(result, -1)\n" +
+                            "    result <- tdk_run(fibonacci, -1)\n" +
+                            "    assert_equals(result, -1)\n" +
+                            "    \n" +
+                            "    return(tdk_return())\n" +
+                            "}\n" +
+                            "testBaseCase <- function() {\n" +
+                            "    tdk_tested_name <- 'fibonacci'\n" +
+                            "    tdk_test_description <- 'Check function has correct base case: fib(0) = 0 and fib(1) = 1'\n" +
+                            "\n" +
+                            "    result <- tdk_run(fibonacci, 0)\n" +
+                            "    assert_equals(result, 0)\n" +
+                            "    result <- tdk_run(fibonacci, 1)\n" +
+                            "    assert_equals(result, 1)\n" +
+                            "    \n" +
+                            "    return(tdk_return())\n" +
+                            "}\n" +
+                            "testIntegers <- function() {\n" +
+                            "    tdk_tested_name <- 'fibonacci'\n" +
+                            "    tdk_test_description <- 'By induction (assuming sane method) only have to check small integers for verification'\n" +
+                            "\n" +
+                            "    result <- tdk_run(fibonacci, 2)\n" +
+                            "    assert_equals(result, 1)\n" +
+                            "    result <- tdk_run(fibonacci, 3)\n" +
+                            "    assert_equals(result, 2)\n" +
+                            "    result <- tdk_run(fibonacci, 7)\n" +
+                            "    assert_equals(result, 13)\n" +
+                            "    \n" +
+                            "    return(tdk_return())\n" +
+                            "}\n"
+
+        var codeIde = CodeMirror.fromTextArea(
+            document.getElementById("code-ide"),
+            {
+                theme: "ayu-dark",
+                indentUnit: 4,
+                lineNumbers: true,
+                viewportMargin: Infinity
+            }
+        );
+        var testIde = CodeMirror.fromTextArea(
+            document.getElementById("test-ide"),
+            {
+                theme: "ayu-dark",
+                indentUnit: 4,
+                lineNumbers: true,
+                viewportMargin: Infinity
+            }
+        );
+
+        function testCode () {
+            const XHR = new XMLHttpRequest();
+            const FD = new FormData();
+
+            FD.append("code", codeIde.getValue());
+            FD.append("tests", testIde.getValue());
+
+            XHR.addEventListener("load", function (e) {
+                document.getElementById("feedback").innerHTML = this.responseText;
+            });
+
+            XHR.open("POST", "/test");
+            XHR.send(FD);
+        }
+
+        function resetCode () {
+            codeIde.setValue(defaultCode);
+            testIde.setValue(defaultTest);
+            document.getElementById("feedback").innerHTML = '<h1 class="text-white">Press submit to assess your code</h1>'
+        }
+        resetCode();
+    </script>
+</body>
+</html>

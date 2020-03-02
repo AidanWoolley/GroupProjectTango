@@ -1,0 +1,155 @@
+<h3 class="text-white"> Validation </h3>
+<div id="accordion">
+{% for s in v_s %}
+    <div class="card text-white bg-success">
+        <div class="card-header" id="headingVS{{loop.index}}">
+        <h5 class="mb-0">
+            <button class="btn btn-link text-white" style="width: 100%; text-align: left;" data-toggle="collapse" data-target="#collapseVS{{loop.index}}">PASSED: {{ s["type"] }}</button>
+        </h5>
+        </div>
+        <div id="collapseVS{{loop.index}}" class="collapse" data-parent="#accordion">
+        <div class="card-body">
+            {{ s["info"] }}
+        </div>
+        </div>
+    </div>
+{% endfor %}
+{% for f in v_f %}
+    <div class="card text-white bg-danger">
+        <div class="card-header" id="headingVF{{loop.index}}">
+        <h5 class="mb-0">
+            <button class="btn btn-link text-white" style="width: 100%; text-align: left;" data-toggle="collapse" data-target="#collapseVF{{loop.index}}">FAILED: {{ f["type"] }}</button>
+        </h5>
+        </div>
+        <div id="collapseVF{{loop.index}}" class="collapse" data-parent="#accordion">
+        <div class="card-body">
+            {{ f["info"] }}
+        </div>
+        </div>
+    </div>
+{% endfor %}
+{% for e in v_e %}
+    <div class="card text-white bg-warning">
+        <div class="card-header" id="headingVE{{loop.index}}">
+        <h5 class="mb-0">
+            <button class="btn btn-link text-white" style="width: 100%; text-align: left;" data-toggle="collapse" data-target="#collapseVE{{loop.index}}">ERROR: {{ e["type"] }}</button>
+        </h5>
+        </div>
+        <div id="collapseVE{{loop.index}}" class="collapse" data-parent="#accordion">
+        <div class="card-body">
+            {{ e["info"] }}
+        </div>
+        </div>
+    </div>
+{% endfor %}
+</div>
+{% if q_e is none %}
+<h3 class="text-white"> Quality </h3>
+<div id="accordion">
+<div class="card text-white bg-info">
+    <div class="card-header" id="headingQN">
+    <h5 class="mb-0">
+        <button class="btn btn-link text-white" style="width: 100%; text-align: left;" data-toggle="collapse" data-target="#collapseQN">Not Executed!</button>
+    </h5>
+    </div>
+    <div id="collapseQN" class="collapse" data-parent="#accordion">
+    <div class="card-body">
+        Quality checking wasn't completed because of a failure in the validation stage!
+    </div>
+    </div>
+</div>
+</div>
+{% elif not q_e %}
+<h3 class="text-white"> Quality: 100%</h3>
+<div id="accordion">
+<div class="card text-white bg-success">
+    <div class="card-header" id="headingQS">
+    <h5 class="mb-0">
+        <button class="btn btn-link text-white" style="width: 100%; text-align: left;" data-toggle="collapse" data-target="#collapseQS">PASSED!</button>
+    </h5>
+    </div>
+    <div id="collapseQS" class="collapse" data-parent="#accordion">
+    <div class="card-body">
+        Quality checking found no issues with your code!
+    </div>
+    </div>
+</div>
+</div>
+{% else %}
+    <h3 class="text-white"> Quality: {{q_score}}%</h3>
+    <div id="accordion">
+{% for e in q_e %}
+    <div class="card text-white bg-danger">
+        <div class="card-header" id="headingQE{{loop.index}}">
+        <h5 class="mb-0">
+            <button class="btn btn-link text-white" style="width: 100%; text-align: left;" data-toggle="collapse" data-target="#collapseQE{{loop.index}}">{{e["type"]}}</button>
+        </h5>
+        </div>
+        <div id="collapseQE{{loop.index}}" class="collapse" data-parent="#accordion">
+        <div class="card-body">
+            Line {{e["line_number"]}}: {{ e["info"] }}
+        </div>
+        </div>
+    </div>
+{% endfor %}
+{% endif %}
+<h3 class="text-white"> Evaluation </h3>
+<div id="accordion">
+{% if e_s is none %}
+    <div class="card text-white bg-info">
+        <div class="card-header" id="headingEN">
+        <h5 class="mb-0">
+            <button class="btn btn-link text-white" style="width: 100%; text-align: left;" data-toggle="collapse" data-target="#collapseEN">Not Executed!</button>
+        </h5>
+        </div>
+        <div id="collapseEN" class="collapse" data-parent="#accordion">
+        <div class="card-body">
+            Test Evaluation wasn't completed because of a failure in the validation stage!
+        </div>
+        </div>
+    </div>
+{% else %}
+{% for e in e_s %}
+    <div class="card text-white bg-success">
+        <div class="card-header" id="headingES{{loop.index}}">
+        <h5 class="mb-0">
+            <button class="btn btn-link text-white" style="width: 100%; text-align: left;" data-toggle="collapse" data-target="#collapseES{{loop.index}}">PASSED: {{ e["test_name"] }}</button>
+        </h5>
+        </div>
+        <div id="collapseES{{loop.index}}" class="collapse" data-parent="#accordion">
+        <div class="card-body">
+            {{ e["test_description"] }}
+        </div>
+        </div>
+    </div>
+{% endfor %}
+{% for e in e_f %}
+    <div class="card text-white bg-danger">
+        <div class="card-header" id="headingEF{{loop.index}}">
+        <h5 class="mb-0">
+            <button class="btn btn-link text-white" style="width: 100%; text-align: left;" data-toggle="collapse" data-target="#collapseEF{{loop.index}}">FAILED: {{ e["test_name"] }}</button>
+        </h5>
+        </div>
+        <div id="collapseEF{{loop.index}}" class="collapse" data-parent="#accordion">
+        <div class="card-body">
+            {{ e["test_description"] }}
+        </div>
+        </div>
+    </div>
+{% endfor %}
+{% for e in e_e %}
+    <div class="card text-white bg-danger">
+        <div class="card-header" id="headingEE{{loop.index}}">
+        <h5 class="mb-0">
+            <button class="btn btn-link text-white" style="width: 100%; text-align: left;" data-toggle="collapse" data-target="#collapseEE{{loop.index}}">ERROR: {{ e["test_name"] }}</button>
+        </h5>
+        </div>
+        <div id="collapseEE{{loop.index}}" class="collapse" data-parent="#accordion">
+        <div class="card-body">
+            {{ e["test_description"] }}
+        </div>
+        </div>
+    </div>
+{% endfor %}
+{% endif%}
+</div>

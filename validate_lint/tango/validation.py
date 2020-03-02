@@ -32,6 +32,8 @@ class Validator(Linter):
     def _invoke_lintr_restricted_functions(file_to_check, restricted_functions):
         """
         Specialized lintr call to only highlight the use of restricted functions.
+        
+        Can't use _invoke_lintr because of stupid line-length limit for function call in R lintr
 
         Params:
             file_to_check (str): the file to check use of any restricted functions in.
@@ -40,11 +42,19 @@ class Validator(Linter):
         Returns:
             (str) Lintr output containing errors for each inappropriate function use.
         """
+
         if not isfile(file_to_check):
             raise FileNotFoundError(file_to_check)
+        # checkstyle_output is XML which is easier to parse and guaranteed consistent
+        # It must be written to a file, /proc/self/fd/1 is stdout!
         restricted_functions_string = ', '.join([f'"{fun}"=""' for fun in restricted_functions])
         undesirable_functions_linter = f'undesirable_function_linter(c({restricted_functions_string}))'
-        return Validator._invoke_lintr(file_to_check, {"linters": undesirable_functions_linter})
+        r_cmd = (
+            f'library("lintr");'
+            f'ufl <- {undesirable_functions_linter};'
+            f'checkstyle_output(lint("{file_to_check}", linters=ufl), "/proc/self/fd/1")'
+        )
+        return Validator._invoke_R(r_cmd)
 
     @staticmethod
     def _get_used_libraries(file_text):

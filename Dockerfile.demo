@@ -1,0 +1,5 @@
+FROM awoolley10/tango:latest
+
+COPY ./demo/config.yaml /home/tango/config.yaml
+
+ENTRYPOINT ["python3", "/home/tango/run_tests.py", "/home/tango/config.yaml"]
