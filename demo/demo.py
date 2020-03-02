@@ -5,10 +5,12 @@ from pretty_msgs import from_validation, from_quality
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def index():
     with open("./edukate_demo.html") as f:
         return f.read()
+
 
 @app.route('/test', methods=["POST"])
 def test_code():
